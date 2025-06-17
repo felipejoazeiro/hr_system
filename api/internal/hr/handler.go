@@ -6,7 +6,7 @@ import (
 )
 
 func CreateEmployeeHandler(c *gin.Context){
-	var newEmployee Employee
+	var newEmployee CreateEmployeeModel
 
 	if err := c.ShouldBinJSON(&newEmployee); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
