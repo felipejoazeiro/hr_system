@@ -1,4 +1,4 @@
-package hr
+package models
 
 import "time"
 

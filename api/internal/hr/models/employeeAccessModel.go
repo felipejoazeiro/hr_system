@@ -1,4 +1,4 @@
-package hr
+package models
 
 type EmployeeAccessModel struct{
 	Login 		string 		`db:"login" json:"login"`

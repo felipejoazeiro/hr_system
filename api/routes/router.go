@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"system/internal/hr"
+	"app/internal/hr"
 )
 
 func SetupRouter() *gin.Engine{

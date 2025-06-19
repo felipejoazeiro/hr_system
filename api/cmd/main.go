@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotnev"
-	"system/pkg/db"
-	"system/routes"
+	"github.com/joho/godotenv"
+	"app/pkg/db"
+	"app/routes"
 )
 
 func main(){
@@ -25,7 +25,7 @@ func main(){
 
 	router:=routes.SetupRouter()
 
-	router.Get("/ping", func(c *gin.Context){
+	router.GET("/ping", func(c *gin.Context){
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 

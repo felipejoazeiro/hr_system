@@ -1,12 +1,13 @@
 package hr
 
 import(
-	"errors"
+	//"errors"
 	"sync"
-	"time"
+	//"time"
+	"app/internal/hr/models"
 )
 
 var (
-	funcionarios []Funcionario
+	funcionarios []models.EmployeeModel
 	mu sync.Mutex
 )

@@ -1,11 +1,14 @@
 package hr
 
-import "github/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"app/internal/hr/handler"
+)
 
-func RegisterRoutes(rg *gin.RouterGroup){
+func RegisterRoutes(rg *gin.RouterGroup) {
 	hrGroup := rg.Group("funcionarios")
 	{
-		hrGroup.POST("", CreateEmployeeHandler)
+		hrGroup.POST("", handler.CreateEmployeeHandler)
 		// futuramente:
 		// hrGroup.GET("", listEmployeeHandler)
 		// hrGroup.PUT("/:id", editEmployeeHandler)

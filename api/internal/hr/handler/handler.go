@@ -1,18 +1,20 @@
-package hr 
+package handler 
 
 import (
+	"app/internal/hr/models"
+	"app/internal/hr/repository"
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateEmployeeHandler(c *gin.Context){
-	var newEmployee CreateEmployeeModel
+	var newEmployee models.CreateEmployeeModel
 
-	if err := c.ShouldBinJSON(&newEmployee); err != nil{
+	if err := c.ShouldBindJSON(&newEmployee); err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	savedEmployee, err := CreateEmployee(newEmployee)
+	savedEmployee, err := repository.CreateEmployee(newEmployee)
 
 	if err != nil{
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})

@@ -1,13 +1,14 @@
-package hr
+package repository
 
 import (
-	"errors"
-	"system/pkg/db"
-	"github.com/jmoiron/sqlx"
+	//"errors"
+	"app/pkg/db"
+	//"github.com/jmoiron/sqlx"
+	"app/internal/hr/models"
 )
 
-func CreateEmployee(e CreateEmployeeModel) (EmployeeModel, error){
-	query = query := `
+func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error){
+	query := `
 		INSERT INTO employees (
 			active_employee, registration, name_employee, email,
 			entry_date, contract_date, photo, date,
@@ -29,7 +30,7 @@ func CreateEmployee(e CreateEmployeeModel) (EmployeeModel, error){
 		) RETURNING *
 	`
 
-	var result EmployeeModel
+	var result models.EmployeeModel
 
 	stmt, err := db.DB.PrepareNamed(query)
 	if err != nil {
