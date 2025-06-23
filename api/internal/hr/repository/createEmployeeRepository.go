@@ -8,6 +8,10 @@ import (
 )
 
 func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error){
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return models.EmployeeModel{}, err
+	}
 	query := `
 		INSERT INTO employees (
 			active_employee, registration, name_employee, email,
@@ -31,12 +35,73 @@ func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error){
 	`
 
 	var result models.EmployeeModel
-
 	stmt, err := db.DB.PrepareNamed(query)
 	if err != nil {
+		tx.Rollback()
 		return result, err
 	}
 	err = stmt.Get(&result, e)
 
-	return result, err
+	login, err := generateUniqueLogin(e.Name, tx)
+	if err != nil{
+		tx.Rollback()
+		return result,err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(e.Registration), bcryptDefaultCost)
+
+	accessQuery := `INSERT INTO access_employee (employee_id, login, password) VALUES ($1,$2,$3)`
+
+	if _, err := tx.Exec(accessQuery, result.ID, login, string(hashedPassword)); err != nil{
+		tx.Rollback()
+		return result, err
+	}
+
+	if err := tx.Commit(); err != nil{
+		return result, err
+	}
+
+	return result, nil
+}
+
+func generateUniqueLogin(name string, tx *db.TX) (string, error){
+	parts: = strings.Fields(string.ToLower(name))
+	if len(parts < 2){
+		return "", fmt.Errorf("precisa ter pelo menos dois nomes")
+	}
+
+	baseLogin := fmt.Sprintf("%s_%s", parts[0], parts[1])
+	login := baseLogin
+
+	var count int
+	query := `SELECT COUNT (*) FROM access_employee WHERE login = $1`
+
+	if err := tx.Get(&count, query, login); err != nil {
+		return "", err
+	}
+
+	i := 2
+
+	for count > 0 && i <len(parts){
+		login = fmt.Sprintf("%s_%s", parts[0], parts[i])
+		if err := tx.Get(&count, query, login); err != nil{
+			return "", err
+		}
+		i++
+	}
+	if count> 0 {
+		i := 1
+		for {
+			newLogin := fmt.Sprintf("%s_%d", baseLogin, i)
+			if err:=tx.Get(&count, query, newLogin); err != nil {
+				return "", err
+			}
+			if count == 0 {
+				login = newLogin
+				break
+			}
+			i++
+		}
+	}
+	return login,nil
 }

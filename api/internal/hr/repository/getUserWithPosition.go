@@ -6,7 +6,6 @@ import (
 	"app/internal/hr/models"
 )
 
-// Variável global do repositório (ou injete via DI)
 var Repository *EmployeeRepository
 
 type EmployeeRepository struct {
@@ -21,7 +20,6 @@ func NewEmployeeRepository(db *sql.DB) *EmployeeRepository {
 	return &EmployeeRepository{db: db}
 }
 
-// GetUserWithPosition busca o usuário incluindo o cargo
 func (r *EmployeeRepository) GetUserWithPosition(login string) (*models.EmployeeWithPosition, error) {
 	query := `
 		SELECT e.login, e.password, c.name as position_name

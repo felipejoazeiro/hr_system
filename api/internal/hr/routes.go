@@ -9,6 +9,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	hrGroup := rg.Group("funcionarios")
 	{
 		hrGroup.POST("", handler.CreateEmployeeHandler)
+		hrGroup.GET("/login", handler.LoginHandler)
 		// futuramente:
 		// hrGroup.GET("", listEmployeeHandler)
 		// hrGroup.PUT("/:id", editEmployeeHandler)
