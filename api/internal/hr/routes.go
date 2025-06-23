@@ -13,6 +13,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 		hrGroup.GET("", handler.ListEmployeeHandler)
 		hrGroup.PATCH("/:id/deactivate", handler.DeactivateEmployeeHandler)
 		hrGroup.PUT("/:id", handler.EditEmployeeHandler)
+		hrGroup.PATCH("/:id", handler.GetEmployeeByIDHandler) 
 		// futuramente:
 		// hrGroup.PUT("/:id", editEmployeeHandler)
 	}
