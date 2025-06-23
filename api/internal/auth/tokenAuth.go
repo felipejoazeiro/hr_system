@@ -2,6 +2,7 @@ package auth
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -22,7 +23,7 @@ func GenerateToken(login,position string)(string, error){
 	claims := &Claims{
 		Login: login,
 		Position: position,
-		Role: determineRole(position),
+		Role: DetermineRole(position),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
@@ -32,8 +33,19 @@ func GenerateToken(login,position string)(string, error){
 	return token.SignedString(jwtKey)
 }
 
+func GetTokenExpiration() time.Duration {
+	expHours := os.Getenv("JWT_EXPIRATION_HOURS")
 
-func determineRole(position string) string{
+	if expHours != "" {
+		expHours, err := strconv.Atoi(expHours)
+		if err == nil {
+			return time.Duration(expHours) * time.Hour
+		}
+	}
+	return 24 * time.Hour
+}
+
+func DetermineRole(position string) string{
 	switch position{
 		case "Gerente":
 			return "admin"
@@ -43,3 +55,6 @@ func determineRole(position string) string{
 			return "user"
 	}
 }
+
+
+

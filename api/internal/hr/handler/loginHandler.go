@@ -37,7 +37,7 @@ func LoginHandler(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{
 		"token":      token,
 		"position":   user.Position,
-		"expires_in": auth.GetTokenExpiration(),
+		"expires_in": auth.GetTokenExpiration().Seconds(),
 	})
 }
 

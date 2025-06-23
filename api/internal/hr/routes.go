@@ -6,13 +6,14 @@ import (
 )
 
 func RegisterRoutes(rg *gin.RouterGroup) {
-	hrGroup := rg.Group("funcionarios")
+	hrGroup := rg.Group("employees")
 	{
 		hrGroup.POST("", handler.CreateEmployeeHandler)
 		hrGroup.GET("/login", handler.LoginHandler)
+		hrGroup.GET("", handler.ListEmployeeHandler)
+		hrGroup.PATCH("/:id/deactivate", handler.DeactivateEmployeeHandler)
+		hrGroup.PUT("/:id", handler.EditEmployeeHandler)
 		// futuramente:
-		// hrGroup.GET("", listEmployeeHandler)
 		// hrGroup.PUT("/:id", editEmployeeHandler)
-		// hrGroup.DELETE("/:id", deleteEmployeeHandler)
 	}
 }
