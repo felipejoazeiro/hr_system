@@ -2,12 +2,19 @@ package repository
 
 import (
 	//"errors"
-	"app/pkg/db"
+	"fmt"
+	"strings"
+
 	//"github.com/jmoiron/sqlx"
 	"app/internal/hr/models"
+	"app/pkg/db"
+
+	"github.com/jmoiron/sqlx"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error){
+func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error) {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return models.EmployeeModel{}, err
@@ -43,30 +50,30 @@ func CreateEmployee(e models.CreateEmployeeModel) (models.EmployeeModel, error){
 	err = stmt.Get(&result, e)
 
 	login, err := generateUniqueLogin(e.Name, tx)
-	if err != nil{
-		tx.Rollback()
-		return result,err
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(e.Registration), bcryptDefaultCost)
-
-	accessQuery := `INSERT INTO access_employee (employee_id, login, password) VALUES ($1,$2,$3)`
-
-	if _, err := tx.Exec(accessQuery, result.ID, login, string(hashedPassword)); err != nil{
+	if err != nil {
 		tx.Rollback()
 		return result, err
 	}
 
-	if err := tx.Commit(); err != nil{
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(e.Registration), bcrypt.DefaultCost)
+
+	accessQuery := `INSERT INTO access_employee (employee_id, login, password) VALUES ($1,$2,$3)`
+
+	if _, err := tx.Exec(accessQuery, result.ID, login, string(hashedPassword)); err != nil {
+		tx.Rollback()
+		return result, err
+	}
+
+	if err := tx.Commit(); err != nil {
 		return result, err
 	}
 
 	return result, nil
 }
 
-func generateUniqueLogin(name string, tx *db.TX) (string, error){
-	parts: = strings.Fields(string.ToLower(name))
-	if len(parts < 2){
+func generateUniqueLogin(name string, tx *sqlx.Tx) (string, error) {
+	parts := strings.Fields(strings.ToLower(name))
+	if len(parts) < 2 {
 		return "", fmt.Errorf("precisa ter pelo menos dois nomes")
 	}
 
@@ -82,18 +89,18 @@ func generateUniqueLogin(name string, tx *db.TX) (string, error){
 
 	i := 2
 
-	for count > 0 && i <len(parts){
+	for count > 0 && i < len(parts) {
 		login = fmt.Sprintf("%s_%s", parts[0], parts[i])
-		if err := tx.Get(&count, query, login); err != nil{
+		if err := tx.Get(&count, query, login); err != nil {
 			return "", err
 		}
 		i++
 	}
-	if count> 0 {
+	if count > 0 {
 		i := 1
 		for {
 			newLogin := fmt.Sprintf("%s_%d", baseLogin, i)
-			if err:=tx.Get(&count, query, newLogin); err != nil {
+			if err := tx.Get(&count, query, newLogin); err != nil {
 				return "", err
 			}
 			if count == 0 {
@@ -103,5 +110,5 @@ func generateUniqueLogin(name string, tx *db.TX) (string, error){
 			i++
 		}
 	}
-	return login,nil
+	return login, nil
 }

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type DetailsEmployeeResponse struct {
 	ActiveEmployee   bool      `db:"active_employee" json:"active_employee"`
 	Registration     string    `db:"registration" json:"registration"`
@@ -7,8 +9,9 @@ type DetailsEmployeeResponse struct {
 	Email            string    `db:"email" json:"email"`
 	EntryDate        time.Time `db:"entry_date" json:"entry_date"`
 	ContractDate     time.Time `db:"contract_date" json:"contract_date"`
+	Position		 string	   `db:"position" json:"position"`
 	Photo            string    `db:"photo" json:"photo"`
-	BirthDate        string    `db:"birthdate" json:"date"` 
+	BirthDate        string    `db:"birthdate" json:"date"`
 	FkCargo          int       `db:"fk_cargo" json:"fk_cargo"`
 	NroTitle         string    `db:"nro_title" json:"nro_title"`
 	ElectoralZone    string    `db:"electoral_zone" json:"electoral_zone"`
