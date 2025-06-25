@@ -15,5 +15,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		sectionsGroup.GET("/", departmentHandler.GetAllDepartments)
 		sectionsGroup.POST("/departments", departmentHandler.CreateDepartment)
+		sectionsGroup.PUT("/departments/:id", departmentHandler.EditDepartment)
+		
 	}
 }

@@ -43,3 +43,21 @@ func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, department)
 }
+
+func (h *DepartmentHandler) EditDepartment(c *gin.Context){
+	
+	id := c.Param("id")
+	var input models.EditDepartmentRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato inválido"})
+		return
+	}
+
+	updated, err := h.repo.EditDepartment(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updated)
+}
+
