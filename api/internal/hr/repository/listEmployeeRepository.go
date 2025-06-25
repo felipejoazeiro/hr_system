@@ -24,12 +24,10 @@ func (r *EmployeeRepository) ListEmployees(filter models.EmployeeFilter) ([]mode
 	var args []interface{}
 	var conditions []string
 
-	// Verificar filtro include_inactive
 	if filter.IncludeInactive != nil && *filter.IncludeInactive {
 		query = strings.Replace(query, "WHERE e.active = true", "WHERE 1=1", 1)
 	}
 
-	// Aplicar filtros adicionais
 	if filter.Position != nil {
 		conditions = append(conditions, "p.name = ?")
 		args = append(args, *filter.Position)
@@ -40,12 +38,10 @@ func (r *EmployeeRepository) ListEmployees(filter models.EmployeeFilter) ([]mode
 		args = append(args, *filter.Department)
 	}
 
-	// Adicionar condições à query
 	if len(conditions) > 0 {
 		query += " AND " + strings.Join(conditions, " AND ")
 	}
 
-	// Executar a query
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
