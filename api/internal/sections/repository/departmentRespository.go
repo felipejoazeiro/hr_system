@@ -97,3 +97,15 @@ func (r *DepartmentRepository) EditDepartment(d models.EditDepartmentRequest) (m
 	)
 	return updated, err
 }
+
+func (r *DepartmentRepository) DeactivateDepartment(id string) error {
+	query := `UPDATE departments SET is_active = false WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+	return err
+}
+
+func (r *DepartmentRepository) ActivateDepartment(id string) error{
+	query = `UPDATE departments SET is_active = true WHERE id = $1`
+	_, err := r.db.Exec(query,id)
+	return err
+}

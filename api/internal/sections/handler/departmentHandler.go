@@ -61,3 +61,22 @@ func (h *DepartmentHandler) EditDepartment(c *gin.Context){
 	c.JSON(http.StatusOK, updated)
 }
 
+func(h *DepartmentHandler) DeactivateDepartment(c *gin.Context){
+	id := c.Param("id")
+
+	if err := h.repo.DeactivateDepartment(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Departamento desativado com sucesso"})
+}
+
+func(h *DepartmentHandler) ActivateDepartment(c *gin.Context){
+	id := c.Param("id")
+	if err := h.repo.ActivateDepartment(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Departamento ativado com sucesso"})
+}
+
