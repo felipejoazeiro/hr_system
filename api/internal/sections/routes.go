@@ -13,10 +13,10 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 	departmentHandler := handler.NewDepartmentHandler(repo)
 	sectionsGroup := rg.Group("/sections")
 	{
-		sectionsGroup.GET("/", departmentHandler.GetAllDepartments)
+		sectionsGroup.GET("/departments", departmentHandler.GetAllDepartments)
 		sectionsGroup.POST("/departments", departmentHandler.CreateDepartment)
 		sectionsGroup.PUT("/departments/:id", departmentHandler.EditDepartment)
-		sectionsGroup.DELETE("/departments/:id/deactive", departmentHandler.DeactivateDepartment)
+		sectionsGroup.DELETE("/departments/:id/deactivate", departmentHandler.DeactivateDepartment)
 		sectionsGroup.PUT("/departments/:id/activate", departmentHandler.DeactivateDepartment)
 	}
 }
