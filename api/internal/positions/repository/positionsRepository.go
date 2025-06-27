@@ -93,6 +93,12 @@ func (r *PositionRepository) EditPosition(id string, input models.EditPosition) 
 	return pos, err
 }
 
-func (r *PositionRepository) DeactivatePosition(id string) (models.PositionModel, error){}
+func (r *PositionRepository) DeactivatePosition(id string) error{
+	_, err := r.db.Exec(`UPDATE positions SET is_active = false WHERE id = ?`, id)
+	return err
+}
 
-func (r *PositionRepository) ReactivePosition(id string) (models.PositionModel, error){}
+func (r *PositionRepository) ReactivePosition(id string) (models.PositionModel, error){
+	_, err := r.db.Exec(`UPDATE positions SET is_active = true WHERE id = ?`, id)
+	return err
+}

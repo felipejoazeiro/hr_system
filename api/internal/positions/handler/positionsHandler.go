@@ -32,8 +32,41 @@ func (h *PositionHandler) GetAllPositions(c *gin.Context){
 	c.JSON(http.StatusOK, positions)
 }
 
-func (h *PositionHandler) EditPosition(c *gin.Context){}
+func (h *PositionHandler) EditPosition(c *gin.Context){
+	id := c.Param("id")
 
-func (h *PositionHandler) DeactivatePosition(c *gin.Context){}
+	var input models.EditPosition
+	if err:= c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato inválido"})
+		return
+	}
 
-func (h *PositionHandler) ReactivePosition(c *gin.Context){}
+	pos, err := h.repo.EditPosition(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, pos)
+}
+
+
+func (h *PositionHandler) DeactivatePosition(c *gin.Context){
+	id := c.Param("id")
+
+	pos, err := h.repo.DeactivatePosition(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOk, gin.H{"message": "Cargo desativado com sucesso"})
+
+}
+
+func (h *PositionHandler) ReactivePosition(c *gin.Context){
+	id := c.Param("id")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Cargo reativado com sucesso!"})
+}
