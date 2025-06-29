@@ -9,13 +9,11 @@ import (
 )
 
 type DepartmentHandler struct {
-	repo *repository.DepartmentRepository
+	repo repository.DepartmentRepositoryInterface
 }
 
-func NewDepartmentHandler(repo *repository.DepartmentRepository) *DepartmentHandler {
-	return &DepartmentHandler{
-		repo: repo,
-	}
+func NewDepartmentHandler(repo repository.DepartmentRepositoryInterface) *DepartmentHandler {
+	return &DepartmentHandler{repo: repo}
 }
 
 func (h *DepartmentHandler) GetAllDepartments(c *gin.Context) {
@@ -44,8 +42,7 @@ func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 	c.JSON(http.StatusCreated, department)
 }
 
-func (h *DepartmentHandler) EditDepartment(c *gin.Context){
-	
+func (h *DepartmentHandler) EditDepartment(c *gin.Context) {
 	id := c.Param("id")
 	var input models.EditDepartmentRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -53,6 +50,7 @@ func (h *DepartmentHandler) EditDepartment(c *gin.Context){
 		return
 	}
 
+	// Passar o ID para o repositório
 	updated, err := h.repo.EditDepartment(id, input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -61,7 +59,7 @@ func (h *DepartmentHandler) EditDepartment(c *gin.Context){
 	c.JSON(http.StatusOK, updated)
 }
 
-func(h *DepartmentHandler) DeactivateDepartment(c *gin.Context){
+func (h *DepartmentHandler) DeactivateDepartment(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.repo.DeactivateDepartment(id); err != nil {
@@ -71,12 +69,11 @@ func(h *DepartmentHandler) DeactivateDepartment(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"message": "Departamento desativado com sucesso"})
 }
 
-func(h *DepartmentHandler) ActivateDepartment(c *gin.Context){
-	id := c.Param("id")
-	if err := h.repo.ActivateDepartment(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Departamento ativado com sucesso"})
+func (h *DepartmentHandler) ReactivateDepartment(c *gin.Context) {
+    id := c.Param("id")
+    if err := h.repo.ReactivateDepartment(id); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"message": "Department reactivated successfully"})
 }
-

@@ -17,6 +17,6 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 		sectionsGroup.POST("/departments", departmentHandler.CreateDepartment)
 		sectionsGroup.PUT("/departments/:id", departmentHandler.EditDepartment)
 		sectionsGroup.DELETE("/departments/:id/deactivate", departmentHandler.DeactivateDepartment)
-		sectionsGroup.PUT("/departments/:id/activate", departmentHandler.DeactivateDepartment)
+		sectionsGroup.PUT("/departments/:id/reactivate", departmentHandler.ReactivateDepartment)
 	}
 }

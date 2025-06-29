@@ -3,6 +3,8 @@ package repository
 import (
 	"app/internal/sections/models"
 	"database/sql"
+	"fmt"
+	"strings"
 )
 
 type DepartmentRepository struct {
@@ -62,40 +64,44 @@ func (r *DepartmentRepository) CreateDepartment(d models.CreateDepartmentRequest
 	return department, err
 }
 
-func (r *DepartmentRepository) EditDepartment(d models.EditDepartmentRequest) (models.EditDepartmentRequest , error) {
-	setParts := []string{}
-	args := []interface{}{}
+func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartmentRequest) (models.DepartmentModel, error) {
+    setParts := []string{}
+    args := []interface{}{}
+    argPos := 1
 
-	if input.Name!= nil{
-		setParts = append(setParts, "name=?")
-		args = append(args, input.Name)
-	}
-	if input.Code != nil {
-		setParts = append(setParts,"code=?")
-		args = append(args, input.Code)
-	}
-	if input.ManagerId != nil {
-		setParts = append(setParts, "manager_id")
-		args = append(args, input.ManagerId)
-	}
+    if d.Name != nil {
+        setParts = append(setParts, fmt.Sprintf("name=$%d", argPos))
+        args = append(args, *d.Name)
+        argPos++
+    }
+    if d.Code != nil {
+        setParts = append(setParts, fmt.Sprintf("code=$%d", argPos))
+        args = append(args, *d.Code)
+        argPos++
+    }
+    if d.ManagerId != nil {
+        setParts = append(setParts, fmt.Sprintf("manager_id=$%d", argPos))
+        args = append(args, *d.ManagerId)
+        argPos++
+    }
 
-	if len(setParts) == 0 {
-		return models.DepartmentModel{}, nil
-	}
+    if len(setParts) == 0 {
+        return models.DepartmentModel{}, nil
+    }
 
-	query := fmt.Sprintf("UPDATE departments SET %s WHERE id= ? RETURNING id, name, code, manager_id", strings.Join(setParts, ", "))
+    args = append(args, id)
+    query := fmt.Sprintf("UPDATE departments SET %s WHERE id=$%d RETURNING id, name, code, manager_id, is_active", 
+        strings.Join(setParts, ", "), argPos)
 
-	args = append(args, id)
-
-	var updated models.DepartmentModel
-	err:= r.db.QueryRow(query, args...).Scan(
-		&updated.ID,
-		&updated.Name,
-		&updated.Code,
-		&updated.ManagerId,
-		&updated.IsActive
-	)
-	return updated, err
+    var updated models.DepartmentModel
+    err := r.db.QueryRow(query, args...).Scan(
+        &updated.ID,
+        &updated.Name,
+        &updated.Code,
+        &updated.ManagerId,
+        &updated.IsActive,
+    )
+    return updated, err
 }
 
 func (r *DepartmentRepository) DeactivateDepartment(id string) error {
@@ -104,8 +110,8 @@ func (r *DepartmentRepository) DeactivateDepartment(id string) error {
 	return err
 }
 
-func (r *DepartmentRepository) ActivateDepartment(id string) error{
-	query = `UPDATE departments SET is_active = true WHERE id = $1`
-	_, err := r.db.Exec(query,id)
+func (r *DepartmentRepository) ReactivateDepartment(id string) error {
+	query := `UPDATE departments SET is_active = true WHERE id = $1`
+	_, err := r.db.Exec(query, id)
 	return err
 }
