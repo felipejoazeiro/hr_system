@@ -3,6 +3,7 @@ package repository
 import (
 	"app/internal/positions/models"
 	"database/sql"
+	"fmt"
 	"strings"
 )
 
@@ -16,7 +17,7 @@ func NewPositionRepository(db *sql.DB) *PositionRepository {
 
 func (r *PositionRepository) CreatePosition(input models.CreatePosition) (models.PositionModel, error) {
 	query := `
-		INSERT INTO positons (name, code, is_active)
+		INSERT INTO positions (name, code, is_active)
 		VALUES ($1, $2, true)
 		RETURNING id, name, code, is_active
 	`
@@ -63,28 +64,33 @@ func (r *PositionRepository) GetAllPositions() ([]models.PositionModel, error) {
 func (r *PositionRepository) EditPosition(id string, input models.EditPosition) (models.PositionModel, error) {
 	setParts := []string{}
 	args := []interface{}{}
+	argIndex := 1
 
 	if input.Name != nil {
-		setParts = append(setParts, "name = ?")
+		setParts = append(setParts, fmt.Sprintf("name = $%d", argIndex))
 		args = append(args, *input.Name)
+		argIndex++
 	}
 	if input.Code != nil {
-		setParts = append(setParts, "code = ?")
+		setParts = append(setParts, fmt.Sprintf("code = $%d", argIndex))
 		args = append(args, *input.Code)
+		argIndex++
 	}
 
 	if len(setParts) == 0 {
-		return models.PositionModel{}, nil
+		return models.PositionModel{}, fmt.Errorf("no fields to update")
 	}
 
-	query := "UPDATE positions SET " + strings.Join(setParts, ", ") + " WHERE id = ? RETURNING id, name, code, is_active"
+	// ID entra como último argumento
+	query := fmt.Sprintf(
+		"UPDATE positions SET %s WHERE id = $%d RETURNING id, name, code, is_active",
+		strings.Join(setParts, ", "),
+		argIndex,
+	)
 	args = append(args, id)
 
 	var pos models.PositionModel
-	err := r.db.QueryRow(
-		query,
-		args...,
-	).Scan(
+	err := r.db.QueryRow(query, args...).Scan(
 		&pos.ID,
 		&pos.Name,
 		&pos.Code,

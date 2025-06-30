@@ -16,6 +16,15 @@ func NewPositionHandler(repo repository.PositionRepositoryInterface) *PositionHa
 	return &PositionHandler{repo: repo}
 }
 
+func (h *PositionHandler) GetAllPositions(c *gin.Context) {
+	positions, err := h.repo.GetAllPositions()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, positions)
+}
+
 func (h *PositionHandler) CreatePosition(c *gin.Context) {
 	var input models.CreatePosition
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -28,15 +37,6 @@ func (h *PositionHandler) CreatePosition(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, position)
-}
-
-func (h *PositionHandler) GetAllPositions(c *gin.Context) {
-	positions, err := h.repo.GetAllPositions()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, positions)
 }
 
 func (h *PositionHandler) EditPosition(c *gin.Context) {

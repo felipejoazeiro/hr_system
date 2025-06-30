@@ -59,7 +59,7 @@ func TestCreatePosition(t *testing.T) {
 	router := setupRouter(handler)
 
 	input := models.CreatePosition{Name: "TI", Code: "1"}
-	expected := models.PositionModel{ID: "1", Name: "TI", IsActive: true, Code: 1}
+	expected := models.PositionModel{ID: "1", Name: "TI", IsActive: true, Code: "1"}
 
 	mockRepo.On("CreatePosition", input).Return(expected, nil)
 
@@ -79,7 +79,7 @@ func TestGetAllPositions(t *testing.T) {
 	router := setupRouter(handler)
 
 	mockRepo.On("GetAllPositions").Return([]models.PositionModel{
-		{ID: "1", Name: "TI", Code: 101, IsActive: true},
+		{ID: "1", Name: "TI", Code: "101", IsActive: true},
 	}, nil)
 
 	w := httptest.NewRecorder()
@@ -98,7 +98,7 @@ func TestEditPosition(t *testing.T) {
 	id := "1"
 	newName := "RH"
 	input := models.EditPosition{Name: &newName}
-	expected := models.PositionModel{ID: "1", Name: "RH", Code: 1, IsActive: true}
+	expected := models.PositionModel{ID: "1", Name: "RH", Code: "1", IsActive: true}
 
 	mockRepo.On("EditPosition", id, input).Return(expected, nil)
 
