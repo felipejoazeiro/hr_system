@@ -16,7 +16,7 @@ func NewDepartmentRepository(db *sql.DB) *DepartmentRepository {
 }
 
 func (r *DepartmentRepository) GetAllDepartments() ([]models.GetDepartmentsRequest, error) {
-	query := `SELECT d.id, d.name, d.code, e.manager_name, d.is_active FROM department d LEFT JOIN employees e ON d.manager_id = e.id;`
+	query := `SELECT d.id, d.name, d.code, e.name_employee, d.is_active FROM departments d LEFT JOIN employees e ON d.manager_id = e.id;`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -28,15 +28,25 @@ func (r *DepartmentRepository) GetAllDepartments() ([]models.GetDepartmentsReque
 
 	for rows.Next() {
 		var dept models.GetDepartmentsRequest
+		var managerName sql.NullString
+
 		err := rows.Scan(
 			&dept.ID,
 			&dept.Name,
 			&dept.Code,
-			&dept.ManagerName,
+			&managerName,
+			&dept.IsActive,
 		)
 		if err != nil {
 			return nil, err
 		}
+
+		if managerName.Valid {
+			dept.ManagerName = managerName.String
+		} else {
+			dept.ManagerName = "N/A"
+		}
+
 		departments = append(departments, dept)
 	}
 
@@ -65,43 +75,43 @@ func (r *DepartmentRepository) CreateDepartment(d models.CreateDepartmentRequest
 }
 
 func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartmentRequest) (models.DepartmentModel, error) {
-    setParts := []string{}
-    args := []interface{}{}
-    argPos := 1
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
 
-    if d.Name != nil {
-        setParts = append(setParts, fmt.Sprintf("name=$%d", argPos))
-        args = append(args, *d.Name)
-        argPos++
-    }
-    if d.Code != nil {
-        setParts = append(setParts, fmt.Sprintf("code=$%d", argPos))
-        args = append(args, *d.Code)
-        argPos++
-    }
-    if d.ManagerId != nil {
-        setParts = append(setParts, fmt.Sprintf("manager_id=$%d", argPos))
-        args = append(args, *d.ManagerId)
-        argPos++
-    }
+	if d.Name != nil {
+		setParts = append(setParts, fmt.Sprintf("name=$%d", argPos))
+		args = append(args, *d.Name)
+		argPos++
+	}
+	if d.Code != nil {
+		setParts = append(setParts, fmt.Sprintf("code=$%d", argPos))
+		args = append(args, *d.Code)
+		argPos++
+	}
+	if d.ManagerId != nil {
+		setParts = append(setParts, fmt.Sprintf("manager_id=$%d", argPos))
+		args = append(args, *d.ManagerId)
+		argPos++
+	}
 
-    if len(setParts) == 0 {
-        return models.DepartmentModel{}, nil
-    }
+	if len(setParts) == 0 {
+		return models.DepartmentModel{}, nil
+	}
 
-    args = append(args, id)
-    query := fmt.Sprintf("UPDATE departments SET %s WHERE id=$%d RETURNING id, name, code, manager_id, is_active", 
-        strings.Join(setParts, ", "), argPos)
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE departments SET %s WHERE id=$%d RETURNING id, name, code, manager_id, is_active",
+		strings.Join(setParts, ", "), argPos)
 
-    var updated models.DepartmentModel
-    err := r.db.QueryRow(query, args...).Scan(
-        &updated.ID,
-        &updated.Name,
-        &updated.Code,
-        &updated.ManagerId,
-        &updated.IsActive,
-    )
-    return updated, err
+	var updated models.DepartmentModel
+	err := r.db.QueryRow(query, args...).Scan(
+		&updated.ID,
+		&updated.Name,
+		&updated.Code,
+		&updated.ManagerId,
+		&updated.IsActive,
+	)
+	return updated, err
 }
 
 func (r *DepartmentRepository) DeactivateDepartment(id string) error {
