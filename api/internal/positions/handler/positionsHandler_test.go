@@ -1,4 +1,18 @@
-package positionHandler_test
+package handler_test
+
+import (
+	"app/internal/positions/handler"
+	"app/internal/positions/models"
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
 
 type MockPositionRepository struct {
 	mock.Mock
@@ -9,13 +23,18 @@ func (m *MockPositionRepository) CreatePosition(input models.CreatePosition) (mo
 	return args.Get(0).(models.PositionModel), args.Error(1)
 }
 
+func (m *MockPositionRepository) EditPosition(id string, input models.EditPosition) (models.PositionModel, error) {
+	args := m.Called(id, input)
+	return args.Get(0).(models.PositionModel), args.Error(1)
+}
+
 func (m *MockPositionRepository) GetAllPositions() ([]models.PositionModel, error) {
 	args := m.Called()
 	return args.Get(0).([]models.PositionModel), args.Error(1)
 }
 
 func (m *MockPositionRepository) DeactivatePosition(id string) error {
-	args:=m.Called(id)
+	args := m.Called(id)
 	return args.Error(0)
 }
 
@@ -34,15 +53,15 @@ func setupRouter(handler *handler.PositionHandler) *gin.Engine {
 	return r
 }
 
-func TestCreatePosition(t *testing.T){
+func TestCreatePosition(t *testing.T) {
 	mockRepo := new(MockPositionRepository)
 	handler := handler.NewPositionHandler(mockRepo)
 	router := setupRouter(handler)
 
-	input := models.CreatePositionRequest{name: "TI", Code:1}
-	expected := models.PositionModel{ID: 1, Name:"TI", IsActive: true, Code: 1}
+	input := models.CreatePosition{Name: "TI", Code: "1"}
+	expected := models.PositionModel{ID: "1", Name: "TI", IsActive: true, Code: 1}
 
-	mockRepo.on("CreatePosition", input).Return(expected, nil)
+	mockRepo.On("CreatePosition", input).Return(expected, nil)
 
 	body, _ := json.Marshal(input)
 	w := httptest.NewRecorder()
@@ -51,36 +70,36 @@ func TestCreatePosition(t *testing.T){
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
-	mockRepo.AssertExceptions(t)
+	mockRepo.AssertExpectations(t)
 }
 
-func TestGetAllPositions(t *testing.T){
+func TestGetAllPositions(t *testing.T) {
 	mockRepo := new(MockPositionRepository)
 	handler := handler.NewPositionHandler(mockRepo)
 	router := setupRouter(handler)
 
 	mockRepo.On("GetAllPositions").Return([]models.PositionModel{
-		{ID: 1, Name: "TI", Code: 101, IsActive: true},
+		{ID: "1", Name: "TI", Code: 101, IsActive: true},
 	}, nil)
 
-	w:=httptest.NewRecorder()
+	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/positions", nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, httpStatusOK, w.Code)
-	mockRepo.AssertExceptions(t)
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockRepo.AssertExpectations(t)
 }
 
-func TestEditPosition(t *testing.T){
+func TestEditPosition(t *testing.T) {
 	mockRepo := new(MockPositionRepository)
 	handler := handler.NewPositionHandler(mockRepo)
 	router := setupRouter(handler)
 
 	id := "1"
 	newName := "RH"
-	input := models.EditPositionRequest{Name: &newName}
-	expected := models.PositionModel{ID: 1, Name: "RH", Code: 1, IsActive: true}
-	
+	input := models.EditPosition{Name: &newName}
+	expected := models.PositionModel{ID: "1", Name: "RH", Code: 1, IsActive: true}
+
 	mockRepo.On("EditPosition", id, input).Return(expected, nil)
 
 	body, _ := json.Marshal(input)
@@ -90,7 +109,7 @@ func TestEditPosition(t *testing.T){
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	mockRepo.AssertExceptions(t)
+	mockRepo.AssertExpectations(t)
 }
 
 func TestDeactivatePosition(t *testing.T) {
@@ -101,26 +120,26 @@ func TestDeactivatePosition(t *testing.T) {
 	id := "1"
 	mockRepo.On("DeactivatePosition", id).Return(nil)
 
-	w:=httptest.NewRecorder()
-	req, _ http.NewRequest("PUT", "/positions/"+id+"/deactivate", nil)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", "/positions/"+id+"/deactivate", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	mockRepo.AssertExceptions(t)
+	mockRepo.AssertExpectations(t)
 }
 
-func TestReactivatePosition(t *testing.T){
+func TestReactivatePosition(t *testing.T) {
 	mockRepo := new(MockPositionRepository)
 	handler := handler.NewPositionHandler(mockRepo)
-	router:= setupRouter(handler)
+	router := setupRouter(handler)
 
-	id:="1"
+	id := "1"
 	mockRepo.On("ReactivatePosition", id).Return(nil)
 
-	w:=httpteste.NewRecorder()
+	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("PUT", "/positions/"+id+"/reactivate", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	mockRepo.AssertExceptions(t)
+	mockRepo.AssertExpectations(t)
 }

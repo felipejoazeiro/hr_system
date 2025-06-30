@@ -1,16 +1,20 @@
 package repository
 
-
+import (
+	"app/internal/positions/models"
+	"database/sql"
+	"strings"
+)
 
 type PositionRepository struct {
 	db *sql.DB
 }
 
-func NewPositionRepository(db *sql.DB) *PositionRepository{
+func NewPositionRepository(db *sql.DB) *PositionRepository {
 	return &PositionRepository{db: db}
 }
 
-func (r *PositionRepository) CreatePosition(input models.CreatePosition) (models.PositionModel, error){
+func (r *PositionRepository) CreatePosition(input models.CreatePosition) (models.PositionModel, error) {
 	query := `
 		INSERT INTO positons (name, code, is_active)
 		VALUES ($1, $2, true)
@@ -19,9 +23,9 @@ func (r *PositionRepository) CreatePosition(input models.CreatePosition) (models
 
 	var pos models.PositionModel
 	err := r.db.QueryRow(
-		query, 
+		query,
 		input.Name,
-		input.Code
+		input.Code,
 	).Scan(
 		&pos.ID,
 		&pos.Name,
@@ -29,48 +33,44 @@ func (r *PositionRepository) CreatePosition(input models.CreatePosition) (models
 		&pos.IsActive,
 	)
 	return pos, err
-}	
+}
 
 func (r *PositionRepository) GetAllPositions() ([]models.PositionModel, error) {
-	query := `SELECT id, name, code, is_active FROM positions ORDER BY id;`;
+	query := `SELECT id, name, code, is_active FROM positions ORDER BY id;`
 
 	rows, err := r.db.Query(query)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	var positions []models.PositionModel
-	for rows.Next(){
+	for rows.Next() {
 		var pos models.PositionModel
 		if err := rows.Scan(
 			&pos.ID,
 			&pos.Name,
 			&pos.Code,
-			&pos.IsActive
-		); err := nil {
+			&pos.IsActive,
+		); err != nil {
 			return nil, err
 		}
 		positions = append(positions, pos)
 	}
-	return positions,nil
+	return positions, nil
 }
 
-func (r *PositionRepository) EditPosition(id string, input models.EditPosition) (models.PositionModel, error){
+func (r *PositionRepository) EditPosition(id string, input models.EditPosition) (models.PositionModel, error) {
 	setParts := []string{}
 	args := []interface{}{}
 
-	if input.Name != nil{
+	if input.Name != nil {
 		setParts = append(setParts, "name = ?")
 		args = append(args, *input.Name)
 	}
 	if input.Code != nil {
 		setParts = append(setParts, "code = ?")
 		args = append(args, *input.Code)
-	}
-	if input.IsActive != nil {
-		setParts = append(setParts, "is_active = ?")
-		args = append(args, *input.IsActive)
 	}
 
 	if len(setParts) == 0 {
@@ -93,12 +93,12 @@ func (r *PositionRepository) EditPosition(id string, input models.EditPosition) 
 	return pos, err
 }
 
-func (r *PositionRepository) DeactivatePosition(id string) error{
+func (r *PositionRepository) DeactivatePosition(id string) error {
 	_, err := r.db.Exec(`UPDATE positions SET is_active = false WHERE id = ?`, id)
 	return err
 }
 
-func (r *PositionRepository) ReactivePosition(id string) (models.PositionModel, error){
+func (r *PositionRepository) ReactivePosition(id string) error {
 	_, err := r.db.Exec(`UPDATE positions SET is_active = true WHERE id = ?`, id)
 	return err
 }
