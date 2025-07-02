@@ -8,7 +8,7 @@ type NewContractHandler(repo repository.ContractsRepositoryInterface) *ContractH
 	return &ContractHandler{repo: repo}
 }
 
-func (h *ContractHandler) createContract(c *gin.Context) {
+func (h *ContractHandler) CreateContract(c *gin.Context) {
 	var input models.CreateFullContractRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -29,7 +29,6 @@ func (h *ContractHandler) createContract(c *gin.Context) {
 			panic(p)
 		}
 	}()
-
 
 	infoId, err := h.repository.CreateContractInfo(tx, input.Info)
 	if err != nil {
@@ -86,5 +85,23 @@ func (h *ContractHandler) createContract(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Contrato criado com sucesso", "id": contractID})
-
 }
+
+func (h *ContractHandler) EditContractValues(c *gin.Context){
+	id := c.Param("id")
+	var input models.EditContractValues
+
+	if err := c.ShouldBindJSON(&input);  err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error" :"JSON inválido: " + err.Error()})
+		return
+	}
+
+	updated, err := h.repo.EditContractValues(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK.updated)
+}
+
+func (h *ContractHandler) EditContractDates(c *gin.Context){}

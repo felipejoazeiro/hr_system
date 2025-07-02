@@ -244,3 +244,59 @@ func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input CreateContr
 
 	return rhId, nil
 }
+
+func (r *ContractsRepository) EditContractValues(id string, c models.EditContractValues) (int, error){
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
+
+	if c.AcronymValues != nil {
+		setParts = append(setParts, fmt.Sprintf("acronym_values=$%d", argPos))
+		args = append(args, *c.AcronymValues)
+		argPos++
+	}
+	if c.BdiService != nil {
+		setParts = append(setParts, fmt.Sprintf("bdi_service=$%d", argPos))
+		args = append(args, c.BdiService)
+		argPos++
+	}
+	if c.BdiMaterial != nil {
+		setParts = append(setParts, fmt.Sprintf("bdi_material=$%d", argPos))
+		args = append(args, c.BdiMaterial)
+		argPos++
+	}
+	if c.BdiLabor != nil {
+		setParts = append(setParts, fmt.Sprintf("bdi_labor=#%d", argPos))
+		args = append(args, c.BdiLabor)
+		argPos++
+	}
+	if c.EntryTable != nil {
+		setParts = append(setParts, fmt.Sprintf("entry_table=$%d", argPos))
+		args = append(args, c.EntryTable)
+		argPos++
+	}
+	if c.SendEmail != nil {
+		setParts = append(setParts, fmt.Sprintf("send_email=$%d", argPos))
+		args = append(args, c.SendEmail)
+		argPos++
+	}
+
+	if len(setParts) == 0 {
+		return models.ContractValuesModel{}, nil
+	}
+
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE contract_value SET %s WHERE id=$%d RETURNING id, acronym_values, bdi_service, bdi_material, bdi_labor, entry_table, send_email; ", strings.Join(setParts, ", "), argPos)
+	var updated models.ContractValuesModel
+	err := r.db.QueryRow(query, args...).Scan(
+		&updated.ID,
+		&updated.AcronymValues,
+		&updated.BdiService,
+		&updated.BdiMaterial,
+		&updated.BdiLabor,
+		&updated.EntryTable,
+		&updated.SendEmail
+	)
+
+	return updated, err
+}
