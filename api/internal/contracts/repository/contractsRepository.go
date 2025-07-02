@@ -40,28 +40,35 @@ func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error
 	return contracts, nil
 }
 
-func (r *ContractsRepository) CreateContract(input CreateContract) (Contract, error){
-	query := `INSERT INTO contracts (name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE) RETURNING id,name, code, research, uses_cpf, is_active, fk_contract_contact, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh, is_active;`
+func (r *ContractsRepository) CreateContract(tx *sql.Tx, input CreateContract) (Contract, error){
+	query := `INSERT INTO contracts (name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE) RETURNING id;`
 
-	var contract models.Contract
+	var contractID int
 
-	err := r.db.QueryRow(query, input.name, input.code, input.research, input.uses_cpf, input.is_active, input.fk_contract_info, input.fk_contract_dates, input.fk_contract_values, input.fk_contract_discount, input.fk_contract_rh, is_active).Scan(
-		&contract.ID,
-		&contract.Name,
-		&contract.Code,
-		&contract.Research,
-		&contract.UsesCpf,
-		&contract.IsActive,
-		&contract.FkContractDates,
-		&contract.FkContractDiscount,
-		&contract.FkContractInfo,
-		&contract.FkContractRh,
-		&contract.FkContractValues,
+	err := tx.QueryRow(
+		query, 
+		input.name, 
+		input.code, 
+		input.research, 
+		input.uses_cpf, 
+		input.is_active, 
+		input.fk_contract_info, 
+		input.fk_contract_dates, 
+		input.fk_contract_values, 
+		input.fk_contract_discount, 
+		input.fk_contract_rh, 
+	).Scan(
+		&contractID
 	)
-	return contract, err
+
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	return contractID, err
 } 
 
-func (r *ContractsRepository) createContractInfo(tx *sql.Tx, input CreateContractInfo) (int, error) {
+func (r *ContractsRepository) CreateContractInfo(tx *sql.Tx, input CreateContractInfo) (int, error) {
 	query := `
 		INSERT INTO contract_info (
 			construction, cap, process, info_pmco, max_employee, address, nro, complement, phone, state, city, cep, email, contact, fk_employee
@@ -93,12 +100,13 @@ func (r *ContractsRepository) createContractInfo(tx *sql.Tx, input CreateContrac
 	).Scan(&infoId)
 
 	if err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 	return infoId, nil
 }
 
-func (r *ContractsRepository) createContractDates(tx *sql.Tx, input CreateContractDates) (int, error) {
+func (r *ContractsRepository) CreateContractDates(tx *sql.Tx, input CreateContractDates) (int, error) {
 	query := `
 		INSERT INTO contract_dates (
 			date_initial,
@@ -125,8 +133,114 @@ func (r *ContractsRepository) createContractDates(tx *sql.Tx, input CreateContra
 	).Scan(&datesId)
 
 	if err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 
 	return datesId, nil
+}
+
+func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input CreateContractValues) (int, error) {
+	query := `
+		INSERT INTO contract_values (
+			acronym_value, 
+			bdi_service,
+			bdi_material,
+			bdi_labor,
+			entry_table,
+			send_email
+		) VALUES (
+			$1, $2, $3, $4, $5, $6 
+		) RETURNING id
+	`
+	var valuesId int
+
+	err  := tx.QueryRow(query,
+		input.AcronymValues,
+		input.BdiService,
+		input.BdiMaterial,
+		input.BdiLabor,
+		input.EntryTable,
+		input.Email,
+	).Scan(&valuesId)
+
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return valuesId, nil
+}
+
+func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input CreateContractDiscount) (int, error) {
+	query := `
+		INSERT INTO contract_discount (
+			disc_identifier,
+			disc_service,
+			disc_transport,
+			disc_tranp_employee,
+			disc_labor,
+			disc_material,
+			disc_field
+		) VALUES (
+		 $1, $2, $3, $4, $5, $6, $7 
+		) RETURNING id
+	`
+
+	var discountId int
+
+	err := tx.QueryRow(
+		query,
+		input.DiscIdentifier,
+		input.DiscService,
+		input.DiscTransport,
+		input.DiscTranpEmployee,
+		input.DiscLabor,
+		input.DiscMaterial,
+		input.DiscField,
+	).Scan(&discountId)
+
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return discountId, nil
+}
+
+func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input CreateContractRhInfo) (int, error) {
+	query := `
+		INSERT INTO contract_rh (
+			hour_limit,
+			minutes_limit,
+			days_first_exp,
+			days_second_exp,
+			data_init,
+			pay_extra_hour,
+			manual_stitch,
+			pays_breakfast
+		) VALUES (
+			$1, $2, $3, $4, $5, $6, $7, $8 
+		) RETURNING id
+	`
+
+	var rhId int
+	err := tx.QueryRow(
+		query,
+		input.HourLimit,
+		input.MinutesLimit,
+		input.DaysFirstExp,
+		input.DaysSecondExp,
+		input.DataInit,
+		input.PayExtraHour,
+		input.ManualStitch,
+		input.PaysBreakfast,
+	).Scan(&rhId)
+
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return rhId, nil
 }

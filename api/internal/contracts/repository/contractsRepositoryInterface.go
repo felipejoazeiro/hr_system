@@ -4,7 +4,7 @@ import (
 	"app/internal/contracts/models"
 )
 
-type ContractsRpositoryInterface interface {
+type ContractsRepositoryInterface interface {
 	GetContract(id int) (models.GetContract, error)
 	GetAllContracts() ([]models.GetAllContracts, error)
 	CreateContract(input models.CreateContract) (models.ContractModel, error)
