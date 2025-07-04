@@ -66,12 +66,6 @@ type EditContract struct {
 	Research			*bool		`json:"research" db:"research"`
 	UsesCpf				*bool		`json:"uses_cpf" db:"uses_cpf"`
 	IsActive 			*bool		`json:"is_active" db:"is_active"`
-	FkContractContact	*int			`json:"fk_contract_contact" db:"fk_contract_contact"`
-	FkContractInfo		*int			`json:"fk_contract_info" db:"fk_contract_info"`
-	FkContractDates		*int			`json:"fk_contract_dates" db:"fk_contract_dates"`
-	FkContractValues	*int			`json:"fk_contract_values" db:"fk_contract_values"`
-	FkContractDiscount	*int			`json:"fk_contract_discount" db:"fk_contract_discount"`
-	FkContractRh		*int			`json:"fk_contract_rh" db:"fk_contract_rh"`
 }
 
 type ContractDatesModel struct {

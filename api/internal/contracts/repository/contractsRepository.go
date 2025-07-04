@@ -245,6 +245,51 @@ func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input CreateContr
 	return rhId, nil
 }
 
+func(r *ContractsRepository) EditContract(id string, c models.EditContract) {
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
+
+	if c.Name != nil {
+		setParts = append(setParts, fmt.Sprintf("name=$%d", argPos))
+		args = append(args, *c.Name)
+		argPos++
+	}
+
+	if c.Code != nil {
+		setParts = append(setParts, fmt.Sprintf("code=$%d", argPos))
+		args = append(args, *c.Code)
+		argPos++
+	}
+
+	if c.Research != nil {
+		setParts = append(setParts, fmt.Sprintf("research=$%d", argPos))
+		args = append(args, *c.Research)
+		argPos++
+	}
+
+	if  c.UsesCpf != nil {
+		setParts = append(setParts, fmt.Sprintf("uses_cpf=$%d", argPos))
+		args = append(args, *c.UsesCpf)
+		argPos++
+	}
+
+	if len(setParts) == 0 {
+		return 0, errors.new("Missing fields for update")
+	}
+
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE contracts SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
+
+	var contractId int
+	err := r.db.QueryRow(query, args...).Scan(
+		&contractId
+	)
+
+	return contractId, err
+
+}
+
 func (r *ContractsRepository) EditContractValues(id string, c models.EditContractValues) (int, error){
 	setParts := []string{}
 	args := []interface{}{}
@@ -299,4 +344,267 @@ func (r *ContractsRepository) EditContractValues(id string, c models.EditContrac
 	)
 
 	return updated, err
+}
+
+func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractInfo) {
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
+
+	if c.Construction != nil {
+		setParts = append(setParts, fmt.Sprintf("construction=$%d", argPos))
+		args = append(args, *d.Construction)
+		argPos++
+	}
+
+	if c.CAP != nil {
+		setParts = append(setParts, fmt.Sprintf("cap=$%d", argPos))
+		args = append(args, *d.CAP)
+		argPos++
+	}
+
+	if d.Process != nil {
+		setParts = append(setParts, fmt.Sprintf("process=$%d", argPos))
+		args = append(args, *d.Process)
+		argPos++
+	}
+	if d.InfoPmco != nil {
+		setParts = append(setParts, fmt.Sprintf("info_pmco=$%d", argPos))
+		args = append(args, *d.InfoPmco)
+		argPos++
+	}
+	if d.MaxEmployee != nil {
+		setParts = append(setParts, fmt.Sprintf("max_employee=$%d", argPos))
+		args = append(args, *d.MaxEmployee)
+		argPos++
+	}
+	if d.Address != nil {
+		setParts = append(setParts, fmt.Sprintf("address=$%d", argPos))
+		args = append(args, *d.Address)
+		argPos++
+	}
+	if d.NRO != nil {
+		setParts = append(setParts, fmt.Sprintf("nro=$%d", argPos))
+		args = append(args, *d.NRO)
+		argPos++
+	}
+	if d.Complement != nil {
+		setParts = append(setParts, fmt.Sprintf("complement=$%d", argPos))
+		args = append(args, *d.Complement)
+		argPos++
+	}
+	if d.Phone != nil {
+		setParts = append(setParts, fmt.Sprintf("phone=$%d", argPos))
+		args = append(args, *d.Phone)
+		argPos++
+	}
+	if d.State != nil {
+		setParts = append(setParts, fmt.Sprintf("state=$%d", argPos))
+		args = append(args, *d.State)
+		argPos++
+	}
+	if d.City != nil {
+		setParts = append(setParts, fmt.Sprintf("city=$%d", argPos))
+		args = append(args, *d.City)
+		argPos++
+	}
+	if d.CEP != nil {
+		setParts = append(setParts, fmt.Sprintf("cep=$%d", argPos))
+		args = append(args, *d.CEP)
+		argPos++
+	}
+	if d.Email != nil {
+		setParts = append(setParts, fmt.Sprintf("email=$%d", argPos))
+		args = append(args, *d.Email)
+		argPos++
+	}
+	if d.Contact != nil {
+		setParts = append(setParts, fmt.Sprintf("contact=$%d", argPos))
+		args = append(args, *d.Contact)
+		argPos++
+	}
+	if d.FkEmployee != nil {
+		setParts = append(setParts, fmt.Sprintf("fk_employee=$%d", argPos))
+		args = append(args, *d.FkEmployee)
+		argPos++
+	} 
+
+	if len(setParts) == 0 {
+    	return 0, errors.New("nenhum campo para atualizar")
+	}		
+
+	args = append(args, id) 
+	query := fmt.Sprintf("UPDATE contract_info SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
+
+	var infoId int
+	err := r.db.QueryRow(query, args...).Scan(
+		&infoId,
+	)
+	return infoId, err
+}
+
+func (r *ContractsRepository) EditContractDates(id string, c models.EditContractDates) {
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
+
+	if c.DateInitial := nil {
+		setParts = append(setParts, fmt.Sprintf("date_initial=$%d", argPos))
+		args = append(args, *c.DateInitial)
+		argPos++
+	}
+
+	if c.DateLimit := nil {
+		setParts = append(setParts, fmt.Sprintf("date_limit=$%d", argPos))
+		args = append(args, *c.DateLimit)
+		argPos++
+	}
+
+	if c.DateGuarantee := nil {
+		setParts = append(setParts, fmt.Sprintf("date_guarantee=$%d", argPos))
+		args = append(argPos, *c.DateProposal)
+		argPos++
+	}
+
+	if c.DateProposal := nil {
+		setParts = append(setParts, fmt.Sprintf("date_proposal=%d", argPos))
+		args = append(argPos, *c.DateProposal)
+		argPos++
+	}
+
+	if c.DateBudget := nil {
+		setParts = append(setParts, fmt.Sprintf("date_budget=$%d", argPos))
+		args = append(argPos, *c.DateBudget)
+		argPos++
+	}
+
+	if c.DateTables := nil {
+		setParts = append(setParts, fmt.Sprintf("date_tables=$%d", argPos))
+		args = append(argPos, *c.DateTables)
+		argPos++
+	}
+
+	if len(setParts) == 0 {
+		return 0, errors.New("nenhum campo para atualizar")
+	}
+
+	args = append(args,id)
+	query = fmt.Sprintf("UPDATE contract_dates SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
+
+	var valuesId int
+
+	err := r.db.QueryRow(query, args...).Scan(&valuesId)
+	return valuesId, err
+}
+
+func (r *ContractsRepository) EditContractDiscount(id string, c models.EditContractDiscount) {
+	setParts := []string{}
+	args := []interface{}{}
+	argPos := 1
+
+	if input.DiscIdentifier != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_identifier=$%d", argPos))
+		args = append(args, *input.DiscIdentifier)
+		argPos++
+	}
+	if input.DiscService != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_service=$%d", argPos))
+		args = append(args, *input.DiscService)
+		argPos++
+	}
+	if input.DiscTransport != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_transport=$%d", argPos))
+		args = append(args, *input.DiscTransport)
+		argPos++
+	}
+	if input.DiscTranpEmployee != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_tranp_employee=$%d", argPos))
+		args = append(args, *input.DiscTranpEmployee)
+		argPos++
+	}
+	if input.DiscLabor != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_labor=$%d", argPos))
+		args = append(args, *input.DiscLabor)
+		argPos++
+	}
+	if input.DiscMaterial != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_material=$%d", argPos))
+		args = append(args, *input.DiscMaterial)
+		argPos++
+	}
+	if input.DiscField != nil {
+		setParts = append(setParts, fmt.Sprintf("disc_field=$%d", argPos))
+		args = append(args, *input.DiscField)
+		argPos++
+	}
+
+	if len(setParts) == 0 {
+		return 0, errors.new("Missing fields for update")
+	}
+
+	var discountId int
+
+	err := r.db.QueryRow(query, args...).Scan(&discountId)
+
+	return discountId, err
+}
+
+func (r *ContractsRepository) EditContractRhInfo(id string, c models.EditContractRhInfo) {
+	setParts := []string
+	args := []interface{}{}
+	argPos := 1
+
+	if input.HourLimit != nil {
+		setParts = append(setParts, fmt.Sprintf("hour_limit=$%d", argPos))
+		args = append(args, *input.HourLimit)
+		argPos++
+	}
+	if input.MinutesLimit != nil {
+		setParts = append(setParts, fmt.Sprintf("minutes_limit=$%d", argPos))
+		args = append(args, *input.MinutesLimit)
+		argPos++
+	}
+	if input.DaysFirstExp != nil {
+		setParts = append(setParts, fmt.Sprintf("days_first_exp=$%d", argPos))
+		args = append(args, *input.DaysFirstExp)
+		argPos++
+	}
+	if input.DaysSecondExp != nil {
+		setParts = append(setParts, fmt.Sprintf("days_second_exp=$%d", argPos))
+		args = append(args, *input.DaysSecondExp)
+		argPos++
+	}
+	if input.DataInit != nil {
+		setParts = append(setParts, fmt.Sprintf("data_init=$%d", argPos))
+		args = append(args, *input.DataInit)
+		argPos++
+	}
+	if input.PayExtraHour != nil {
+		setParts = append(setParts, fmt.Sprintf("pay_extra_hour=$%d", argPos))
+		args = append(args, *input.PayExtraHour)
+		argPos++
+	}
+	if input.ManualStitch != nil {
+		setParts = append(setParts, fmt.Sprintf("manual_stitch=$%d", argPos))
+		args = append(args, *input.ManualStitch)
+		argPos++
+	}
+	if input.PaysBreakfast != nil {
+		setParts = append(setParts, fmt.Sprintf("pays_breakfast=$%d", argPos))
+		args = append(args, *input.PaysBreakfast)
+		argPos++
+	}
+
+	if len(setParts) == 0 {
+		return 0, errors.new("Missing fields for update")
+	}
+
+	query := fmt.Sprintf("UPDATE contract_rh_info SET %s WHERE id=$%d RETURNING id", string.Join(setParts, ", "), argPos)
+
+	var contractRhId int
+	err := r.db.QueryRow(query, args...).Scan(
+		&contractRhId
+	)
+
+	return contractRhId, err
 }

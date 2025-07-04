@@ -96,7 +96,7 @@ func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartment
 	}
 
 	if len(setParts) == 0 {
-		return models.DepartmentModel{}, nil
+		return models.DepartmentModel{}, errors.New("nenhum campo para atualizar")
 	}
 
 	args = append(args, id)
