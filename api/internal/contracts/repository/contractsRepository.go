@@ -608,3 +608,15 @@ func (r *ContractsRepository) EditContractRhInfo(id string, c models.EditContrac
 
 	return contractRhId, err
 }
+
+func (r *ContractsRepository) DeactivateContract(id string) {
+	query := `UPDATE contract SET is_active = false WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+	return err
+}
+
+func (r *ContractsRepository) ReactivateDepartment(id string){
+	query := `UPDATE contract SET is_active = true WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+	return err
+}
