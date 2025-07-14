@@ -50,7 +50,6 @@ func (h *DepartmentHandler) EditDepartment(c *gin.Context) {
 		return
 	}
 
-	// Passar o ID para o repositório
 	updated, err := h.repo.EditDepartment(id, input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

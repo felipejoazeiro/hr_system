@@ -12,6 +12,7 @@ func SetupRouter() *gin.Engine{
 	{
 		hr.RegisterRoutes(api)
 		sections.RegisterRoutes(api)
+		sindicates.RegisterRoutes(api)
 	}
 	return router
 }
