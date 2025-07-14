@@ -189,3 +189,22 @@ func (h *ContractHandler) EditContractValues(c *gin.context) {
 	}
 	c.JSON(http.StatusOK, updated)
 }
+
+func (h *ContractHandler) DeactivateContract(c *gin.Context){
+	id := c.Param("id")
+
+	if err := h.repo.DeactivateContract(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Contract deactivated successfully"})
+}
+
+func(h *ContractHandler) ReactivateContract(c *gin.Context){
+	id := c.Param("id")
+	if err := h.repo.ReactivateContract(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Contract reactivated successfully"})
+}
