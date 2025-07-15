@@ -16,7 +16,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 		positionsGroup.GET("/", positionHandler.GetAllPositions)
 		positionsGroup.POST("/", positionHandler.CreatePosition)
 		positionsGroup.PUT("/:id", positionHandler.EditPosition)
-		positionsGroup.PUT("/:id/deactivate", positionHandler.DeactivatePosition)
-		positionsGroup.PUT("/:id/reactivate", positionHandler.ReactivePosition)
+		positionsGroup.PATCH("/:id/deactivate", positionHandler.DeactivatePosition)
+		positionsGroup.PATCH("/:id/reactivate", positionHandler.ReactivePosition)
 	}
 }

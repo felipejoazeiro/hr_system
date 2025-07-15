@@ -100,11 +100,11 @@ func (r *PositionRepository) EditPosition(id string, input models.EditPosition) 
 }
 
 func (r *PositionRepository) DeactivatePosition(id string) error {
-	_, err := r.db.Exec(`UPDATE positions SET is_active = false WHERE id = ?`, id)
+	_, err := r.db.Exec(`UPDATE positions SET is_active = false WHERE id = $1`, id)
 	return err
 }
 
 func (r *PositionRepository) ReactivePosition(id string) error {
-	_, err := r.db.Exec(`UPDATE positions SET is_active = true WHERE id = ?`, id)
+	_, err := r.db.Exec(`UPDATE positions SET is_active = true WHERE id = $1`, id)
 	return err
 }
