@@ -1,11 +1,19 @@
 package repository
 
+import (
+	"app/internal/contracts/models"
+	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
+)
+
 type ContractsRepository struct {
 	db *sql.DB
 }
 
 func NewContractsRepository(db *sql.DB) *ContractsRepository {
-	return &ContractsRepository{db:db}
+	return &ContractsRepository{db: db}
 }
 
 func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error) {
@@ -13,18 +21,18 @@ func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
-	} 
+	}
 	defer rows.Close()
 
 	var contracts []models.GetAllContracts
 
-	for rows.Next(){
+	for rows.Next() {
 		var contract models.GetAllContracts
 		err := rows.Scan(
 			&contract.ID,
 			&contract.Name,
 			&contract.Code,
-			&contract.InitialDate
+			&contract.InitialDate,
 		)
 
 		if err != nil {
@@ -40,35 +48,36 @@ func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error
 	return contracts, nil
 }
 
-func (r *ContractsRepository) CreateContract(tx *sql.Tx, input CreateContract) (Contract, error){
+func (r *ContractsRepository) CreateContract(tx *sql.Tx, input models.CreateContract) (int, error) {
 	query := `INSERT INTO contracts (name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE) RETURNING id;`
 
 	var contractID int
 
 	err := tx.QueryRow(
-		query, 
-		input.name, 
-		input.code, 
-		input.research, 
-		input.uses_cpf, 
-		input.is_active, 
-		input.fk_contract_info, 
-		input.fk_contract_dates, 
-		input.fk_contract_values, 
-		input.fk_contract_discount, 
-		input.fk_contract_rh, 
+		query,
+		input.Name,
+		input.Code,
+		input.Research,
+		input.UsesCpf,
+		input.IsActive,
+		input.FkContractInfo,
+		input.FkContractDates,
+		input.FkContractValues,
+		input.FkContractDiscount,
+		input.FkContractRh,
 	).Scan(
-		&contractID
+		&contractID,
 	)
 
 	if err != nil {
 		tx.Rollback()
 		return 0, err
 	}
-	return contractID, err
-} 
 
-func (r *ContractsRepository) CreateContractInfo(tx *sql.Tx, input CreateContractInfo) (int, error) {
+	return contractID, err
+}
+
+func (r *ContractsRepository) CreateContractInfo(tx *sql.Tx, input models.CreateContractInfo) (int, error) {
 	query := `
 		INSERT INTO contract_info (
 			construction, cap, process, info_pmco, max_employee, address, nro, complement, phone, state, city, cep, email, contact, fk_employee
@@ -106,7 +115,7 @@ func (r *ContractsRepository) CreateContractInfo(tx *sql.Tx, input CreateContrac
 	return infoId, nil
 }
 
-func (r *ContractsRepository) CreateContractDates(tx *sql.Tx, input CreateContractDates) (int, error) {
+func (r *ContractsRepository) CreateContractDates(tx *sql.Tx, input models.CreateContractDates) (int, error) {
 	query := `
 		INSERT INTO contract_dates (
 			date_initial,
@@ -140,7 +149,7 @@ func (r *ContractsRepository) CreateContractDates(tx *sql.Tx, input CreateContra
 	return datesId, nil
 }
 
-func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input CreateContractValues) (int, error) {
+func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input models.CreateContractValues) (int, error) {
 	query := `
 		INSERT INTO contract_values (
 			acronym_value, 
@@ -155,13 +164,13 @@ func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input CreateContr
 	`
 	var valuesId int
 
-	err  := tx.QueryRow(query,
+	err := tx.QueryRow(query,
 		input.AcronymValues,
 		input.BdiService,
 		input.BdiMaterial,
 		input.BdiLabor,
 		input.EntryTable,
-		input.Email,
+		input.SendEmail,
 	).Scan(&valuesId)
 
 	if err != nil {
@@ -172,7 +181,7 @@ func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input CreateContr
 	return valuesId, nil
 }
 
-func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input CreateContractDiscount) (int, error) {
+func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input models.CreateContractDiscount) (int, error) {
 	query := `
 		INSERT INTO contract_discount (
 			disc_identifier,
@@ -208,7 +217,7 @@ func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input CreateCon
 	return discountId, nil
 }
 
-func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input CreateContractRhInfo) (int, error) {
+func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input models.CreateContractRhInfo) (int, error) {
 	query := `
 		INSERT INTO contract_rh (
 			hour_limit,
@@ -245,7 +254,7 @@ func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input CreateContr
 	return rhId, nil
 }
 
-func(r *ContractsRepository) EditContract(id string, c models.EditContract) {
+func (r *ContractsRepository) EditContract(id string, c models.EditContract) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -268,14 +277,14 @@ func(r *ContractsRepository) EditContract(id string, c models.EditContract) {
 		argPos++
 	}
 
-	if  c.UsesCpf != nil {
+	if c.UsesCpf != nil {
 		setParts = append(setParts, fmt.Sprintf("uses_cpf=$%d", argPos))
 		args = append(args, *c.UsesCpf)
 		argPos++
 	}
 
 	if len(setParts) == 0 {
-		return 0, errors.new("Missing fields for update")
+		return 0, errors.New("Missing fields for update")
 	}
 
 	args = append(args, id)
@@ -283,14 +292,14 @@ func(r *ContractsRepository) EditContract(id string, c models.EditContract) {
 
 	var contractId int
 	err := r.db.QueryRow(query, args...).Scan(
-		&contractId
+		&contractId,
 	)
 
 	return contractId, err
 
 }
 
-func (r *ContractsRepository) EditContractValues(id string, c models.EditContractValues) (int, error){
+func (r *ContractsRepository) EditContractValues(id string, c models.EditContractValues) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -327,7 +336,7 @@ func (r *ContractsRepository) EditContractValues(id string, c models.EditContrac
 	}
 
 	if len(setParts) == 0 {
-		return models.ContractValuesModel{}, nil
+		return 0, errors.New("Missing fields for update")
 	}
 
 	args = append(args, id)
@@ -340,100 +349,100 @@ func (r *ContractsRepository) EditContractValues(id string, c models.EditContrac
 		&updated.BdiMaterial,
 		&updated.BdiLabor,
 		&updated.EntryTable,
-		&updated.SendEmail
+		&updated.SendEmail,
 	)
 
-	return updated, err
+	return updated.ID, err
 }
 
-func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractInfo) {
+func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractInfo) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
 
 	if c.Construction != nil {
 		setParts = append(setParts, fmt.Sprintf("construction=$%d", argPos))
-		args = append(args, *d.Construction)
+		args = append(args, *c.Construction)
 		argPos++
 	}
 
 	if c.CAP != nil {
 		setParts = append(setParts, fmt.Sprintf("cap=$%d", argPos))
-		args = append(args, *d.CAP)
+		args = append(args, *c.CAP)
 		argPos++
 	}
 
-	if d.Process != nil {
+	if c.Process != nil {
 		setParts = append(setParts, fmt.Sprintf("process=$%d", argPos))
-		args = append(args, *d.Process)
+		args = append(args, *c.Process)
 		argPos++
 	}
-	if d.InfoPmco != nil {
+	if c.InfoPmco != nil {
 		setParts = append(setParts, fmt.Sprintf("info_pmco=$%d", argPos))
-		args = append(args, *d.InfoPmco)
+		args = append(args, *c.InfoPmco)
 		argPos++
 	}
-	if d.MaxEmployee != nil {
+	if c.MaxEmployee != nil {
 		setParts = append(setParts, fmt.Sprintf("max_employee=$%d", argPos))
-		args = append(args, *d.MaxEmployee)
+		args = append(args, *c.MaxEmployee)
 		argPos++
 	}
-	if d.Address != nil {
+	if c.Address != nil {
 		setParts = append(setParts, fmt.Sprintf("address=$%d", argPos))
-		args = append(args, *d.Address)
+		args = append(args, *c.Address)
 		argPos++
 	}
-	if d.NRO != nil {
+	if c.NRO != nil {
 		setParts = append(setParts, fmt.Sprintf("nro=$%d", argPos))
-		args = append(args, *d.NRO)
+		args = append(args, *c.NRO)
 		argPos++
 	}
-	if d.Complement != nil {
+	if c.Complement != nil {
 		setParts = append(setParts, fmt.Sprintf("complement=$%d", argPos))
-		args = append(args, *d.Complement)
+		args = append(args, *c.Complement)
 		argPos++
 	}
-	if d.Phone != nil {
+	if c.Phone != nil {
 		setParts = append(setParts, fmt.Sprintf("phone=$%d", argPos))
-		args = append(args, *d.Phone)
+		args = append(args, *c.Phone)
 		argPos++
 	}
-	if d.State != nil {
+	if c.State != nil {
 		setParts = append(setParts, fmt.Sprintf("state=$%d", argPos))
-		args = append(args, *d.State)
+		args = append(args, *c.State)
 		argPos++
 	}
-	if d.City != nil {
+	if c.City != nil {
 		setParts = append(setParts, fmt.Sprintf("city=$%d", argPos))
-		args = append(args, *d.City)
+		args = append(args, *c.City)
 		argPos++
 	}
-	if d.CEP != nil {
+	if c.CEP != nil {
 		setParts = append(setParts, fmt.Sprintf("cep=$%d", argPos))
-		args = append(args, *d.CEP)
+		args = append(args, *c.CEP)
 		argPos++
 	}
-	if d.Email != nil {
+	if c.Email != nil {
 		setParts = append(setParts, fmt.Sprintf("email=$%d", argPos))
-		args = append(args, *d.Email)
+		args = append(args, *c.Email)
 		argPos++
 	}
-	if d.Contact != nil {
+	if c.Contact != nil {
 		setParts = append(setParts, fmt.Sprintf("contact=$%d", argPos))
-		args = append(args, *d.Contact)
+		args = append(args, *c.Contact)
 		argPos++
 	}
-	if d.FkEmployee != nil {
+	if c.FkEmployee != nil {
 		setParts = append(setParts, fmt.Sprintf("fk_employee=$%d", argPos))
-		args = append(args, *d.FkEmployee)
+		args = append(args, *c.FkEmployee)
 		argPos++
-	} 
+	}
 
 	if len(setParts) == 0 {
-    	return 0, errors.New("nenhum campo para atualizar")
-	}		
+		return 0, errors.New("nenhum campo para atualizar")
+	}
 
-	args = append(args, id) 
+	args = append(args, id)
 	query := fmt.Sprintf("UPDATE contract_info SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
 
 	var infoId int
@@ -443,42 +452,42 @@ func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractI
 	return infoId, err
 }
 
-func (r *ContractsRepository) EditContractDates(id string, c models.EditContractDates) {
+func (r *ContractsRepository) EditContractDates(id string, c models.EditContractDates) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
 
-	if c.DateInitial := nil {
+	if c.DateInitial != nil {
 		setParts = append(setParts, fmt.Sprintf("date_initial=$%d", argPos))
 		args = append(args, *c.DateInitial)
 		argPos++
 	}
 
-	if c.DateLimit := nil {
+	if c.DateLimit != nil {
 		setParts = append(setParts, fmt.Sprintf("date_limit=$%d", argPos))
 		args = append(args, *c.DateLimit)
 		argPos++
 	}
 
-	if c.DateGuarantee := nil {
+	if c.DateGuarantee != nil {
 		setParts = append(setParts, fmt.Sprintf("date_guarantee=$%d", argPos))
 		args = append(argPos, *c.DateProposal)
 		argPos++
 	}
 
-	if c.DateProposal := nil {
+	if c.DateProposal != nil {
 		setParts = append(setParts, fmt.Sprintf("date_proposal=%d", argPos))
 		args = append(argPos, *c.DateProposal)
 		argPos++
 	}
 
-	if c.DateBudget := nil {
+	if c.DateBudget != nil {
 		setParts = append(setParts, fmt.Sprintf("date_budget=$%d", argPos))
 		args = append(argPos, *c.DateBudget)
 		argPos++
 	}
 
-	if c.DateTables := nil {
+	if c.DateTables != nil {
 		setParts = append(setParts, fmt.Sprintf("date_tables=$%d", argPos))
 		args = append(argPos, *c.DateTables)
 		argPos++
@@ -488,8 +497,8 @@ func (r *ContractsRepository) EditContractDates(id string, c models.EditContract
 		return 0, errors.New("nenhum campo para atualizar")
 	}
 
-	args = append(args,id)
-	query = fmt.Sprintf("UPDATE contract_dates SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE contract_dates SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
 
 	var valuesId int
 
@@ -497,52 +506,54 @@ func (r *ContractsRepository) EditContractDates(id string, c models.EditContract
 	return valuesId, err
 }
 
-func (r *ContractsRepository) EditContractDiscount(id string, c models.EditContractDiscount) {
+func (r *ContractsRepository) EditContractDiscount(id string, c models.EditContractDiscount) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
 
-	if input.DiscIdentifier != nil {
+	if c.DiscIdentifier != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_identifier=$%d", argPos))
-		args = append(args, *input.DiscIdentifier)
+		args = append(args, *c.DiscIdentifier)
 		argPos++
 	}
-	if input.DiscService != nil {
+	if c.DiscService != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_service=$%d", argPos))
-		args = append(args, *input.DiscService)
+		args = append(args, *c.DiscService)
 		argPos++
 	}
-	if input.DiscTransport != nil {
+	if c.DiscTransport != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_transport=$%d", argPos))
-		args = append(args, *input.DiscTransport)
+		args = append(args, *c.DiscTransport)
 		argPos++
 	}
-	if input.DiscTranpEmployee != nil {
+	if c.DiscTranpEmployee != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_tranp_employee=$%d", argPos))
-		args = append(args, *input.DiscTranpEmployee)
+		args = append(args, *c.DiscTranpEmployee)
 		argPos++
 	}
-	if input.DiscLabor != nil {
+	if c.DiscLabor != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_labor=$%d", argPos))
-		args = append(args, *input.DiscLabor)
+		args = append(args, *c.DiscLabor)
 		argPos++
 	}
-	if input.DiscMaterial != nil {
+	if c.DiscMaterial != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_material=$%d", argPos))
-		args = append(args, *input.DiscMaterial)
+		args = append(args, *c.DiscMaterial)
 		argPos++
 	}
-	if input.DiscField != nil {
+	if c.DiscField != nil {
 		setParts = append(setParts, fmt.Sprintf("disc_field=$%d", argPos))
-		args = append(args, *input.DiscField)
+		args = append(args, *c.DiscField)
 		argPos++
 	}
 
 	if len(setParts) == 0 {
-		return 0, errors.new("Missing fields for update")
+		return 0, errors.New("Missing fields for update")
 	}
 
 	var discountId int
+
+	query := fmt.Sprintf("")
 
 	err := r.db.QueryRow(query, args...).Scan(&discountId)
 
@@ -603,7 +614,7 @@ func (r *ContractsRepository) EditContractRhInfo(id string, c models.EditContrac
 
 	var contractRhId int
 	err := r.db.QueryRow(query, args...).Scan(
-		&contractRhId
+		&contractRhId,
 	)
 
 	return contractRhId, err
@@ -615,7 +626,7 @@ func (r *ContractsRepository) DeactivateContract(id string) {
 	return err
 }
 
-func (r *ContractsRepository) ReactivateDepartment(id string){
+func (r *ContractsRepository) ReactivateDepartment(id string) {
 	query := `UPDATE contract SET is_active = true WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err

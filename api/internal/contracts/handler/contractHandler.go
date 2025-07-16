@@ -1,10 +1,19 @@
 package handler
 
+import (
+	"app/internal/contracts/models"
+	"app/internal/contracts/repository"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
 type ContractHandler struct {
 	repo repository.ContractsRepositoryInterface
 }
 
-type NewContractHandler(repo repository.ContractsRepositoryInterface) *ContractHandler {
+func NewContractHandler(repo repository.ContractsRepositoryInterface) *ContractHandler {
 	return &ContractHandler{repo: repo}
 }
 
@@ -12,7 +21,7 @@ func (h *ContractHandler) CreateContract(c *gin.Context) {
 	var input models.CreateFullContractRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error" :"JSON inválido: " + err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: " + err.Error()})
 		return
 	}
 
@@ -87,12 +96,12 @@ func (h *ContractHandler) CreateContract(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Contrato criado com sucesso", "id": contractID})
 }
 
-func (h *ContractHandler) EditContractValues(c *gin.Context){
+func (h *ContractHandler) EditContractValues(c *gin.Context) {
 	id := c.Param("id")
 	var input models.EditContractValues
 
-	if err := c.ShouldBindJSON(&input);  err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error" :"JSON inválido: " + err.Error()})
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: " + err.Error()})
 		return
 	}
 
@@ -104,7 +113,7 @@ func (h *ContractHandler) EditContractValues(c *gin.Context){
 	c.JSON(http.StatusOK, updated)
 }
 
-func (h *ContractHandler) EditContractDates(c *gin.Context){
+func (h *ContractHandler) EditContractDates(c *gin.Context) {
 	id := c.Param("id")
 
 	var input models.EditContractDates
@@ -114,7 +123,7 @@ func (h *ContractHandler) EditContractDates(c *gin.Context){
 		return
 	}
 
-	updated, err := h.repo.EditContractDates(id,input)
+	updated, err := h.repo.EditContractDates(id, input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -123,12 +132,12 @@ func (h *ContractHandler) EditContractDates(c *gin.Context){
 }
 
 func (h *ContractHandler) EditContractDiscount(c *gin.Context) {
-	if := c.Param("id")
+	id := c.Param("id")
 
 	var input models.EditContractDiscount
 
-	if err := c.ShouldBindJSON(&input); err != nil{
-		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: "+err.Error()})
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: " + err.Error()})
 		return
 	}
 	updated, err := h.repo.EditContractDiscount(id, input)
@@ -190,7 +199,7 @@ func (h *ContractHandler) EditContractValues(c *gin.context) {
 	c.JSON(http.StatusOK, updated)
 }
 
-func (h *ContractHandler) DeactivateContract(c *gin.Context){
+func (h *ContractHandler) DeactivateContract(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.repo.DeactivateContract(id); err != nil {
@@ -200,7 +209,7 @@ func (h *ContractHandler) DeactivateContract(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"message": "Contract deactivated successfully"})
 }
 
-func(h *ContractHandler) ReactivateContract(c *gin.Context){
+func (h *ContractHandler) ReactivateContract(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.repo.ReactivateContract(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
