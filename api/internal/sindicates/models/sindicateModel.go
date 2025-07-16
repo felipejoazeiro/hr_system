@@ -14,6 +14,18 @@ type SindicateModel struct {
 	IsActive					bool 			`json:"is_activate" db:"is_activate"`
 }
 
+type CreateSindicateReq struct {
+	NroRegister					string							`json:"nro_register" db:"nro_register"`
+	DateStart					date							`json:"date_start" db:"date_start"`
+	DateFinish					date							`json:"date_finish" db:"date_finish`
+	SindicatePercents			CreateSindicatePercents			`json:"sindicate_percents"`
+	SindicateValues				CreateSindicateValues			`json:"sindicate_values"`
+	SindicateAuthorization		CreateSindicateAuthorization	`json:"sindicate_authorization"`
+	SindicateBreakfest			CreateSindicateBreakfest		`json:"sindicate_breakfest"`
+	SindicateCarePackage		CreateSindicateCarePackage		`json:"sindicate_care_package"`
+	SindicateVoucher			CreateSindicateVaucher			`json:"sindicate_voucher"`
+}
+
 type GetSindicatesModel struct {
 	ID 							int				`json:"id" db:"id"`
 	NroRegister					string			`json:"nro_register" db:"nro_register"`
@@ -259,4 +271,39 @@ type SindicateCarePackage struct {
 	MedCertificateDisc		bool			`json:"med_certificate_disc" db:"med_certificate_disc"`
 	MedCertificatePropDisc	bool			`json:"med_certificate_prop_disc" db:"med_certificate_prop_disc"`
 	BasicNature				bool			`json:"basic_nature" db:"basic_nature"`
+}
+
+type CreateSindicateCarePackage struct {
+	DiscountBasic			int				`json:"discount_basic" db:"discount_basic"`
+	ValueBasic				int				`json:"value_basic" db:"value_basic"`
+	LimitDiscBasic			int				`json:"limit_disc_basic" db:"limit_disc_basic"`
+	AbscenceDiscBasic		bool			`json:"abscence_disc_basic" db:"abscence_disc_basic"`
+	LeaveDiscBasic			bool			`json:"leave_disc_basic" db:"leave_disc_basic"`
+	VacationDisc			bool			`json:"vacation_disc" db:"vacation_disc"`
+	VacationDiscountProp	bool			`json:"vacation_discount_prop" db:"vacation_discount_prop"`	
+	GetBasicWithOneDay		bool			`json:"get_basic_with_one_day" db:"get_basic_with_one_day"`
+	MagneticCard			bool			`json:"magnetic_card" db:"magnetic_card"`
+	MissesDayPropDisc		bool			`json:"misses_day_prop_disc" db:"misses_day_prop_disc"`
+	LeavePropDisc			bool			`json:"leave_prop_disc" db:"leave_prop_disc"`
+	MedCertificateDisc		bool			`json:"med_certificate_disc" db:"med_certificate_disc"`
+	MedCertificatePropDisc	bool			`json:"med_certificate_prop_disc" db:"med_certificate_prop_disc"`
+	BasicNature				bool			`json:"basic_nature" db:"basic_nature"`
+}
+
+type EditSindicateCarePackage struct {
+	DiscountBasic			*int			`json:"discount_basic" db:"discount_basic"`
+	ValueBasic				*int			`json:"value_basic" db:"value_basic"`
+	LimitDiscBasic			*int			`json:"limit_disc_basic" db:"limit_disc_basic"`
+	AbscenceDiscBasic		*bool			`json:"abscence_disc_basic" db:"abscence_disc_basic"`
+	LeaveDiscBasic			*bool			`json:"leave_disc_basic" db:"leave_disc_basic"`
+	VacationDisc			*bool			`json:"vacation_disc" db:"vacation_disc"`
+	VacationDiscountProp	*bool			`json:"vacation_discount_prop" db:"vacation_discount_prop"`	
+	GetBasicWithOneDay		*bool			`json:"get_basic_with_one_day" db:"get_basic_with_one_day"`
+	MagneticCard			*bool			`json:"magnetic_card" db:"magnetic_card"`
+	MissesDayPropDisc		*bool			`json:"misses_day_prop_disc" db:"misses_day_prop_disc"`
+	LeavePropDisc			*bool			`json:"leave_prop_disc" db:"leave_prop_disc"`
+	MedCertificateDisc		*bool			`json:"med_certificate_disc" db:"med_certificate_disc"`
+	MedCertificatePropDisc	*bool			`json:"med_certificate_prop_disc" db:"med_certificate_prop_disc"`
+	BasicNature				*bool			`json:"basic_nature" db:"basic_nature"`
+
 }
