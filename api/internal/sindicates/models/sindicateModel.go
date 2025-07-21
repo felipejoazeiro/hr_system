@@ -212,7 +212,7 @@ type CreateSindicateBreakfest struct {
 
 type EditSindicateBreakfest struct {
 	MedCertificationDisc			*bool			`json:"med_certification_disc" bd:"med_certification_disc"`
-	MedCertificationDisProp			*bool			`json:"med_certification_disc_prop" bd:"med_certification_dic_prop"`
+	MedCertificationDiscProp		*bool			`json:"med_certification_disc_prop" bd:"med_certification_dic_prop"`
 	AbscenceDiscount				*bool			`json:"abscence_discount" bd:"abscence_discount"`
 	AbscenceDiscountProp			*bool			`json:"abscence_discount_prop" bd:"abscence_discount_prop"`
 	VacationDiscount				*bool			`json:"vacation_discount" bd:"vacation_discount"`
@@ -224,7 +224,6 @@ type EditSindicateBreakfest struct {
 	ValueDay						*int				`json:"value_day" bd:"value_day"`
 	ValueMonth						*int				`json:"value_month" bd:"value_month"`
 	LimitDesc						*int				`json:"limit_desc" bd:"limit_desc"`
-
 }
 
 type SindicateAuthorization struct {
