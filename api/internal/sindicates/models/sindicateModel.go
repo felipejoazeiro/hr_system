@@ -220,10 +220,10 @@ type EditSindicateBreakfest struct {
 	LeaveDiscount					*bool			`json:"leave_discount" bd:"leave_discount"`
 	LeaveDiscountProp				*bool			`json:"leave_discount_prop" bd:"leave_discount_prop"`
 	BreakNature						*bool			`json:"break_nature" bd:"break_nature"`
-	LimitDescPercent				*int				`json:"limit_desc_percent" bd:"limit_desc_percent"`
-	ValueDay						*int				`json:"value_day" bd:"value_day"`
-	ValueMonth						*int				`json:"value_month" bd:"value_month"`
-	LimitDesc						*int				`json:"limit_desc" bd:"limit_desc"`
+	LimitDescPercent				*int			`json:"limit_desc_percent" bd:"limit_desc_percent"`
+	ValueDay						*int			`json:"value_day" bd:"value_day"`
+	ValueMonth						*int			`json:"value_month" bd:"value_month"`
+	LimitDesc						*int			`json:"limit_desc" bd:"limit_desc"`
 }
 
 type SindicateAuthorization struct {
