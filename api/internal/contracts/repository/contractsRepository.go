@@ -77,7 +77,7 @@ func (r *ContractsRepository) CreateContract(tx *sql.Tx, input models.CreateCont
 	return contractID, err
 }
 
-func (r *ContractsRepository) CreateContractInfo(tx *sql.Tx, input models.CreateContractInfo) (int, error) {
+func (r *ContractsRepository) CreateContractInfos(tx *sql.Tx, input models.CreateContractInfo) (int, error) {
 	query := `
 		INSERT INTO contract_info (
 			construction, cap, process, info_pmco, max_employee, address, nro, complement, phone, state, city, cep, email, contact, fk_employee
@@ -254,7 +254,7 @@ func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input models.Crea
 	return rhId, nil
 }
 
-func (r *ContractsRepository) EditContract(id string, c models.EditContract) (int, error) {
+func (r *ContractsRepository) EditContract(id int, c models.EditContract) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -299,7 +299,7 @@ func (r *ContractsRepository) EditContract(id string, c models.EditContract) (in
 
 }
 
-func (r *ContractsRepository) EditContractValues(id string, c models.EditContractValues) (int, error) {
+func (r *ContractsRepository) EditContractValues(id int, c models.EditContractValues) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -355,7 +355,7 @@ func (r *ContractsRepository) EditContractValues(id string, c models.EditContrac
 	return updated.ID, err
 }
 
-func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractInfo) (int, error) {
+func (r *ContractsRepository) EditContractInfos(id int, c models.EditContractInfo) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -452,7 +452,7 @@ func (r *ContractsRepository) EditContractInfo(id string, c models.EditContractI
 	return infoId, err
 }
 
-func (r *ContractsRepository) EditContractDates(id string, c models.EditContractDates) (int, error) {
+func (r *ContractsRepository) EditContractDates(id int, c models.EditContractDates) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -471,25 +471,25 @@ func (r *ContractsRepository) EditContractDates(id string, c models.EditContract
 
 	if c.DateGuarantee != nil {
 		setParts = append(setParts, fmt.Sprintf("date_guarantee=$%d", argPos))
-		args = append(argPos, *c.DateProposal)
+		args = append(args, *c.DateProposal)
 		argPos++
 	}
 
 	if c.DateProposal != nil {
 		setParts = append(setParts, fmt.Sprintf("date_proposal=%d", argPos))
-		args = append(argPos, *c.DateProposal)
+		args = append(args, *c.DateProposal)
 		argPos++
 	}
 
 	if c.DateBudget != nil {
 		setParts = append(setParts, fmt.Sprintf("date_budget=$%d", argPos))
-		args = append(argPos, *c.DateBudget)
+		args = append(args, *c.DateBudget)
 		argPos++
 	}
 
 	if c.DateTables != nil {
 		setParts = append(setParts, fmt.Sprintf("date_tables=$%d", argPos))
-		args = append(argPos, *c.DateTables)
+		args = append(args, *c.DateTables)
 		argPos++
 	}
 
@@ -506,7 +506,7 @@ func (r *ContractsRepository) EditContractDates(id string, c models.EditContract
 	return valuesId, err
 }
 
-func (r *ContractsRepository) EditContractDiscount(id string, c models.EditContractDiscount) (int, error) {
+func (r *ContractsRepository) EditContractDiscount(id int, c models.EditContractDiscount) (int, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -560,57 +560,57 @@ func (r *ContractsRepository) EditContractDiscount(id string, c models.EditContr
 	return discountId, err
 }
 
-func (r *ContractsRepository) EditContractRhInfo(id string, c models.EditContractRhInfo) {
-	setParts := []string
+func (r *ContractsRepository) EditContractRhInfo(id int, c models.EditContractRhInfo) (int, error) {
+	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
 
-	if input.HourLimit != nil {
+	if c.HourLimit != nil {
 		setParts = append(setParts, fmt.Sprintf("hour_limit=$%d", argPos))
-		args = append(args, *input.HourLimit)
+		args = append(args, *c.HourLimit)
 		argPos++
 	}
-	if input.MinutesLimit != nil {
+	if c.MinutesLimit != nil {
 		setParts = append(setParts, fmt.Sprintf("minutes_limit=$%d", argPos))
-		args = append(args, *input.MinutesLimit)
+		args = append(args, *c.MinutesLimit)
 		argPos++
 	}
-	if input.DaysFirstExp != nil {
+	if c.DaysFirstExp != nil {
 		setParts = append(setParts, fmt.Sprintf("days_first_exp=$%d", argPos))
-		args = append(args, *input.DaysFirstExp)
+		args = append(args, *c.DaysFirstExp)
 		argPos++
 	}
-	if input.DaysSecondExp != nil {
+	if c.DaysSecondExp != nil {
 		setParts = append(setParts, fmt.Sprintf("days_second_exp=$%d", argPos))
-		args = append(args, *input.DaysSecondExp)
+		args = append(args, *c.DaysSecondExp)
 		argPos++
 	}
-	if input.DataInit != nil {
+	if c.DataInit != nil {
 		setParts = append(setParts, fmt.Sprintf("data_init=$%d", argPos))
-		args = append(args, *input.DataInit)
+		args = append(args, *c.DataInit)
 		argPos++
 	}
-	if input.PayExtraHour != nil {
+	if c.PayExtraHour != nil {
 		setParts = append(setParts, fmt.Sprintf("pay_extra_hour=$%d", argPos))
-		args = append(args, *input.PayExtraHour)
+		args = append(args, *c.PayExtraHour)
 		argPos++
 	}
-	if input.ManualStitch != nil {
+	if c.ManualStitch != nil {
 		setParts = append(setParts, fmt.Sprintf("manual_stitch=$%d", argPos))
-		args = append(args, *input.ManualStitch)
+		args = append(args, *c.ManualStitch)
 		argPos++
 	}
-	if input.PaysBreakfast != nil {
+	if c.PaysBreakfast != nil {
 		setParts = append(setParts, fmt.Sprintf("pays_breakfast=$%d", argPos))
-		args = append(args, *input.PaysBreakfast)
+		args = append(args, *c.PaysBreakfast)
 		argPos++
 	}
 
 	if len(setParts) == 0 {
-		return 0, errors.new("Missing fields for update")
+		return 0, errors.New("Missing fields for update")
 	}
 
-	query := fmt.Sprintf("UPDATE contract_rh_info SET %s WHERE id=$%d RETURNING id", string.Join(setParts, ", "), argPos)
+	query := fmt.Sprintf("UPDATE contract_rh_info SET %s WHERE id=$%d RETURNING id", strings.Join(setParts, ", "), argPos)
 
 	var contractRhId int
 	err := r.db.QueryRow(query, args...).Scan(
@@ -620,14 +620,180 @@ func (r *ContractsRepository) EditContractRhInfo(id string, c models.EditContrac
 	return contractRhId, err
 }
 
-func (r *ContractsRepository) DeactivateContract(id string) {
+func (r *ContractsRepository) DeactivateContract(id int) error {
 	query := `UPDATE contract SET is_active = false WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err
 }
 
-func (r *ContractsRepository) ReactivateDepartment(id string) {
+func (r *ContractsRepository) ReactivateContract(id int) error {
 	query := `UPDATE contract SET is_active = true WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err
+}
+
+func (r *ContractsRepository) GetContract(id int) (models.GetAllContracts, error) {
+	query := `SELECT c.id, c.name, c.code, d.date_initial FROM contracts c LEFT JOIN contracts_date d ON c.fk_contract_dates = d.id WHERE c.id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contract models.GetAllContracts
+	err := row.Scan(
+		&contract.ID,
+		&contract.Name,
+		&contract.Code,
+		&contract.InitialDate,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.GetAllContracts{}, fmt.Errorf("contract with id %s not found", id)
+		}
+		return models.GetAllContracts{}, err
+	}
+	return contract, nil
+}
+
+func (r *ContractsRepository) GetContractByID(id int) (models.Contract, error) {
+	query := `SELECT id, name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh FROM contracts WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contract models.Contract
+	err := row.Scan(
+		&contract.ID,
+		&contract.Name,
+		&contract.Code,
+		&contract.Research,
+		&contract.UsesCpf,
+		&contract.IsActive,
+		&contract.FkContractInfo,
+		&contract.FkContractDates,
+		&contract.FkContractValues,
+		&contract.FkContractDiscount,
+		&contract.FkContractRh,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.Contract{}, fmt.Errorf("contract with id %d not found", id)
+		}
+		return models.Contract{}, err
+	}
+	return contract, nil
+}
+
+func (r *ContractsRepository) GetContractInfos(id int) (models.ContractInfoModel, error) {
+	query := `SELECT id, construction, cap, process, info_pmco, max_employee, address, nro, complement, phone, state, city, cep, email, contact, fk_employee FROM contract_info WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contractInfo models.ContractInfoModel
+	err := row.Scan(
+		&contractInfo.ID,
+		&contractInfo.Construction,
+		&contractInfo.CAP,
+		&contractInfo.Process,
+		&contractInfo.InfoPmco,
+		&contractInfo.MaxEmployee,
+		&contractInfo.Address,
+		&contractInfo.NRO,
+		&contractInfo.Complement,
+		&contractInfo.Phone,
+		&contractInfo.State,
+		&contractInfo.City,
+		&contractInfo.CEP,
+		&contractInfo.Email,
+		&contractInfo.Contact,
+		&contractInfo.FkEmployee,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.ContractInfoModel{}, fmt.Errorf("contract info with id %d not found", id)
+		}
+		return models.ContractInfoModel{}, err
+	}
+	return contractInfo, nil
+}
+func (r *ContractsRepository) GetContractDates(id int) (models.ContractDatesModel, error) {
+	query := `SELECT id, date_initial, date_limit, date_guarantee, date_proposal, date_budget, date_tables FROM contract_dates WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contractDates models.ContractDatesModel
+	err := row.Scan(
+		&contractDates.ID,
+		&contractDates.DateInitial,
+		&contractDates.DateLimit,
+		&contractDates.DateGuarantee,
+		&contractDates.DateProposal,
+
+		&contractDates.DateBudget,
+		&contractDates.DateTables,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.ContractDatesModel{}, fmt.Errorf("contract dates with id %d not found", id)
+		}
+		return models.ContractDatesModel{}, err
+	}
+	return contractDates, nil
+}
+
+func (r *ContractsRepository) GetContractDiscount(id int) (models.ContractDiscountModel, error) {
+	query := `SELECT id, disc_identifier, disc_service, disc_transport, disc_tranp_employee, disc_labor, disc_material, disc_field FROM contract_discount WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contractDiscount models.ContractDiscountModel
+	err := row.Scan(
+		&contractDiscount.ID,
+		&contractDiscount.DiscIdentifier,
+		&contractDiscount.DiscService,
+		&contractDiscount.DiscTransport,
+		&contractDiscount.DiscTranpEmployee,
+		&contractDiscount.DiscLabor,
+		&contractDiscount.DiscMaterial,
+		&contractDiscount.DiscField,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.ContractDiscountModel{}, fmt.Errorf("contract discount with id %d not found", id)
+		}
+		return models.ContractDiscountModel{}, err
+	}
+	return contractDiscount, nil
+}
+
+func (r *ContractsRepository) GetContractRhInfo(id int) (models.ContractRhInfoModel, error) {
+	query := `SELECT id, hour_limit, minutes_limit, days_first_exp, days_second_exp, data_init, pay_extra_hour, manual_stitch, pays_breakfast FROM contract_rh WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contractRhInfo models.ContractRhInfoModel
+	err := row.Scan(
+		&contractRhInfo.ID,
+		&contractRhInfo.HourLimit,
+		&contractRhInfo.MinutesLimit,
+		&contractRhInfo.DaysFirstExp,
+		&contractRhInfo.DaysSecondExp,
+		&contractRhInfo.DataInit,
+		&contractRhInfo.PayExtraHour,
+		&contractRhInfo.ManualStitch,
+		&contractRhInfo.PaysBreakfast,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.ContractRhInfoModel{}, fmt.Errorf("contract rh info with id %d not found", id)
+		}
+		return models.ContractRhInfoModel{}, err
+	}
+	return contractRhInfo, nil
+}
+func (r *ContractsRepository) GetContractValues(id int) (models.ContractValuesModel, error) {
+	query := `SELECT id, acronym_values, bdi_service, bdi_material, bdi_labor, entry_table, send_email FROM contract_values WHERE id = $1;`
+	row := r.db.QueryRow(query, id)
+	var contractValues models.ContractValuesModel
+	err := row.Scan(
+		&contractValues.ID,
+		&contractValues.AcronymValues,
+		&contractValues.BdiService,
+		&contractValues.BdiMaterial,
+		&contractValues.BdiLabor,
+		&contractValues.EntryTable,
+		&contractValues.SendEmail,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.ContractValuesModel{}, fmt.Errorf("contract values with id %d not found", id)
+		}
+		return models.ContractValuesModel{}, err
+	}
+	return contractValues, nil
 }
