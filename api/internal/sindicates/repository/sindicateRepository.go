@@ -713,3 +713,4 @@ func (r *SindicateRepository) CreateSindicate(d models.CreateSindicateReq) (int,
 		voucherId).Scan(&id)
 	return id, err
 }
+
