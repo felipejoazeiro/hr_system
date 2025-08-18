@@ -553,11 +553,11 @@ func (r *SindicateRepository) ReactivateSindicate(id int) error {
 	return err
 }
 
-func (r *SindicateRepository) CreateSindicatePercents(d models.SindicatePercents) (int, error) {
+func (r *SindicateRepository) CreateSindicatePercents(tx *sql.Tx, d models.SindicatePercents) (int, error) {
 	query := `INSERT INTO sindicate_percents (extra_hour_week, extra_hour_saturday, extra_hour_sunday_holidays, sindicate_contr, seconci, salary_advance_percents, incentive_qualify, complem_retirement, night_time) 
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.ExtraHourWeek,
 		d.ExtraHourSaturday,
 		d.ExtraHourSundayHolidays,
@@ -570,11 +570,11 @@ func (r *SindicateRepository) CreateSindicatePercents(d models.SindicatePercents
 	return id, err
 }
 
-func (r *SindicateRepository) CreateSindicateValues(d models.CreateSindicateValues) (int, error) {
+func (r *SindicateRepository) CreateSindicateValues(tx *sql.Tx, d models.CreateSindicateValues) (int, error) {
 	query := `INSERT INTO sindicate_values (attendance, base_salary, health_insurance, christmas_bonus, associative_contribution, childcare_assistance, education_aid, unhealthness_aid, dangerousness, night_time_supplement)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.Attendance,
 		d.BaseSalary,
 		d.HealthInsurance,
@@ -588,11 +588,11 @@ func (r *SindicateRepository) CreateSindicateValues(d models.CreateSindicateValu
 	return id, err
 }
 
-func (r *SindicateRepository) CreateSindicateVoucher(d models.CreateSindicateVoucher) (int, error) {
+func (r *SindicateRepository) CreateSindicateVoucher(tx *sql.Tx, d models.CreateSindicateVoucher) (int, error) {
 	query := `INSERT INTO sindicate_voucher (abscence_discount_vavr, abscence_discount_vt, med_certificate_discount_vavr, med_certificate_discount_vt, vacation_discount_vavr, vacation_discount_vt, sick_leave_discount_vavr_inss, sick_leave_discount_vt_inss, value_alim_day, deduct_limit_by_allowanceon_payroll, percentual_deduct, deduct_limit_by_vavr_on_payroll, discount_vt_perc)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.AbscenceDiscountVAVR,
 		d.AbscenceDiscountVT,
 		d.MedCertificateDiscountVAVR,
@@ -609,11 +609,11 @@ func (r *SindicateRepository) CreateSindicateVoucher(d models.CreateSindicateVou
 	return id, err
 }
 
-func (r *SindicateRepository) CreateSindicateCarePackage(d models.CreateSindicateCarePackage) (int, error) {
+func (r *SindicateRepository) CreateSindicateCarePackage(tx *sql.Tx, d models.CreateSindicateCarePackage) (int, error) {
 	query := `INSERT INTO sindicate_care_package (discount_basic, value_basic, limit_disc_basic, abscence_disc_basic, leave_disc_basic, vacation_disc, vacation_discount_prop, get_basic_with_one_day, magnetic_card, misses_day_prop_discount, leave_prop_disc, med_certificate_disc, med_certificate_prop_disc, basic_nature)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.DiscountBasic,
 		d.ValueBasic,
 		d.LimitDiscBasic,
@@ -631,11 +631,11 @@ func (r *SindicateRepository) CreateSindicateCarePackage(d models.CreateSindicat
 	return id, err
 }
 
-func (r *SindicateRepository) CreateSindicateAuthorization(d models.CreateSindicateAuthorization) (int, error) {
+func (r *SindicateRepository) CreateSindicateAuthorization(tx *sql.Tx, d models.CreateSindicateAuthorization) (int, error) {
 	query := `INSERT INTO sindicate_authorization (normal_hour, salary_advance, bank_hours, shift_work, sind_pay_beneith_empl, mobile_point_app_approval)
 			  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.NormalHour,
 		d.SalaryAdvance,
 		d.BankHours,
@@ -645,11 +645,11 @@ func (r *SindicateRepository) CreateSindicateAuthorization(d models.CreateSindic
 	return id, err
 }
 
-func (r *SindicateRepository) CreateSindicateBreakfest(d models.CreateSindicateBreakfest) (int, error) {
+func (r *SindicateRepository) CreateSindicateBreakfest(tx *sql.Tx, d models.CreateSindicateBreakfest) (int, error) {
 	query := `INSERT INTO sindicate_breakfest (med_certification_disc, med_certification_disc_prop, abscence_discount, abscence_discount_prop, vacation_discount, vacation_discount_prop, leave_discount, leave_discount_prop, break_nature, limit_desc_percent, value_day, value_month, limit_desc)
 			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`
 	var id int
-	err := r.db.QueryRow(query,
+	err := tx.QueryRow(query,
 		d.MedCertificationDisc,
 		d.MedCertificationDiscProp,
 		d.AbscenceDiscount,
@@ -668,6 +668,18 @@ func (r *SindicateRepository) CreateSindicateBreakfest(d models.CreateSindicateB
 
 func (r *SindicateRepository) CreateSindicate(d models.CreateSindicateReq) (int, error) {
 	
+	tx, err := r.db.Begin()
+
+	if err != nil {
+		return 0, err
+	}
+
+	defer func(){
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
 	percentsId, err := r.CreateSindicatePercents(d.SindicatePercents)
 	if err != nil {	
 		return 0, err
@@ -711,6 +723,15 @@ func (r *SindicateRepository) CreateSindicate(d models.CreateSindicateReq) (int,
 		percentsId,
 		valuesId,
 		voucherId).Scan(&id)
-	return id, err
+
+	if err != nil {
+		return 0, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
