@@ -17,7 +17,7 @@ func NewContractsRepository(db *sql.DB) *ContractsRepository {
 }
 
 func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error) {
-	query := `SELECT c.id, c.name, c.code, d.date_initial FROM contracts c LEFT JOIN contracts_date d ON c.fk_contract_dates = d.id;`
+	query := `SELECT c.id, c.name, c.code, d.date_initial FROM contracts c LEFT JOIN contract_dates d ON c.fk_contract_dates = d.id;`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,9 @@ func (r *ContractsRepository) GetAllContracts() ([]models.GetAllContracts, error
 }
 
 func (r *ContractsRepository) CreateContract(tx *sql.Tx, input models.CreateContract) (int, error) {
-	query := `INSERT INTO contracts (name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh, is_active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE) RETURNING id;`
+	fmt.Printf("Creating contract with input: %+v\n", input)
+
+	query := `INSERT INTO contracts (name, code, research, uses_cpf, is_active, fk_contract_info, fk_contract_dates, fk_contract_values, fk_contract_discount, fk_contract_rh) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id;`
 
 	var contractID int
 
@@ -152,7 +154,7 @@ func (r *ContractsRepository) CreateContractDates(tx *sql.Tx, input models.Creat
 func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input models.CreateContractValues) (int, error) {
 	query := `
 		INSERT INTO contract_values (
-			acronym_value, 
+			acronym_values, 
 			bdi_service,
 			bdi_material,
 			bdi_labor,
@@ -182,6 +184,8 @@ func (r *ContractsRepository) CreateContractValues(tx *sql.Tx, input models.Crea
 }
 
 func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input models.CreateContractDiscount) (int, error) {
+	fmt.Println("Creating contract discount with input:", input)
+
 	query := `
 		INSERT INTO contract_discount (
 			disc_identifier,
@@ -209,6 +213,8 @@ func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input models.Cr
 		input.DiscField,
 	).Scan(&discountId)
 
+	fmt.Println("Discount ID after creation:", discountId)
+
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -219,7 +225,7 @@ func (r *ContractsRepository) CreateContractDiscount(tx *sql.Tx, input models.Cr
 
 func (r *ContractsRepository) CreateContractRhInfo(tx *sql.Tx, input models.CreateContractRhInfo) (int, error) {
 	query := `
-		INSERT INTO contract_rh (
+		INSERT INTO contract_rh_info (
 			hour_limit,
 			minutes_limit,
 			days_first_exp,
@@ -340,7 +346,7 @@ func (r *ContractsRepository) EditContractValues(id int, c models.EditContractVa
 	}
 
 	args = append(args, id)
-	query := fmt.Sprintf("UPDATE contract_value SET %s WHERE id=$%d RETURNING id, acronym_values, bdi_service, bdi_material, bdi_labor, entry_table, send_email; ", strings.Join(setParts, ", "), argPos)
+	query := fmt.Sprintf("UPDATE contract_values SET %s WHERE id=$%d RETURNING id, acronym_values, bdi_service, bdi_material, bdi_labor, entry_table, send_email; ", strings.Join(setParts, ", "), argPos)
 	var updated models.ContractValuesModel
 	err := r.db.QueryRow(query, args...).Scan(
 		&updated.ID,

@@ -19,6 +19,58 @@ func NewContractHandler(repo repository.ContractsRepositoryInterface) *ContractH
 	return &ContractHandler{repo: repo}
 }
 
+func (h *ContractHandler) GetAllContracts(c *gin.Context) {
+	contracts, err := h.repo.GetAllContracts()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar contratos"})
+		return
+	}
+	c.JSON(http.StatusOK, contracts)
+}
+
+func (h *ContractHandler) GetContractByID(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+	contract, err := h.repo.GetContractByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar contrato"})
+		return
+	}
+	if contract.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Contrato não encontrado"})
+		return
+	}
+	c.JSON(http.StatusOK, contract)
+}
+
+func (h *ContractHandler) EditContract(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+	var input models.EditContract
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido: " + err.Error()})
+		return
+	}
+	updated, err := h.repo.EditContract(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao editar contrato"})
+		return
+	}
+	if updated == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Contrato não encontrado"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Contrato atualizado com sucesso", "id": updated})
+}
+
 func (h *ContractHandler) CreateContract(c *gin.Context) {
 	var input models.CreateFullContractRequest
 

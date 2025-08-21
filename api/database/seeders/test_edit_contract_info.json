@@ -1,0 +1,17 @@
+{
+  "construction": "Edifício Comercial Atualizado",
+  "cap": "CAP-EDIT-2024-001",
+  "process": "PROC-EDIT-001",
+  "info_pmco": "Informações atualizadas do projeto - Edifício comercial moderno com tecnologia sustentável",
+  "max_employee": 85,
+  "address": "Av. Editada, 1500",
+  "nro": 1500,
+  "complement": "Torre Editada",
+  "phone": 11999888777,
+  "state": "RJ",
+  "city": "Rio de Janeiro",
+  "cep": "20000-000",
+  "email": "editado@empresa.com",
+  "contact": "Gerente Editado",
+  "fk_employee": 3
+}
