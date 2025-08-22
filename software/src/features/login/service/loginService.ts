@@ -4,8 +4,8 @@ import type { LoginRequest, LoginReponse } from "../entitys/loginEntity";
 import type { ApiResult } from "../../../app/types";
 
 const schema = z.object({
-    login: z.string().min(3).max(100),
-    password: z.string().min(6).max(100),
+    login: z.string().min(3, "Login must be more than 3 characters").max(100),
+    password: z.string().min(6, "Password must be more than 6 characters").max(100),
 });
 
 export const loginService = {

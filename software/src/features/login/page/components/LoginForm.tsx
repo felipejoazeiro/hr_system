@@ -48,7 +48,8 @@ export default function LoginForm() {
                 error={fieldErr.password ?? null}
             />
             <button type="submit" disabled={loading} className="mt-2 w-full rounded-lg bg-black px-4 py-2 text-white disabled:opacity-60">
-                {loading ? "Logging in..." : "Log in"}
+                {loading ? <> <span className="inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      </> : "Log in"}
             </button>
         </form>
     );
