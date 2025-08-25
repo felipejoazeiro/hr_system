@@ -326,7 +326,7 @@ func (r *ContractsRepository) EditContractValues(id int, c models.EditContractVa
 		argPos++
 	}
 	if c.BdiLabor != nil {
-		setParts = append(setParts, fmt.Sprintf("bdi_labor=#%d", argPos))
+		setParts = append(setParts, fmt.Sprintf("bdi_labor=$%d", argPos))
 		args = append(args, c.BdiLabor)
 		argPos++
 	}
@@ -477,12 +477,12 @@ func (r *ContractsRepository) EditContractDates(id int, c models.EditContractDat
 
 	if c.DateGuarantee != nil {
 		setParts = append(setParts, fmt.Sprintf("date_guarantee=$%d", argPos))
-		args = append(args, *c.DateProposal)
+		args = append(args, *c.DateGuarantee)
 		argPos++
 	}
 
 	if c.DateProposal != nil {
-		setParts = append(setParts, fmt.Sprintf("date_proposal=%d", argPos))
+		setParts = append(setParts, fmt.Sprintf("date_proposal=$%d", argPos))
 		args = append(args, *c.DateProposal)
 		argPos++
 	}
@@ -557,10 +557,10 @@ func (r *ContractsRepository) EditContractDiscount(id int, c models.EditContract
 		return 0, errors.New("Missing fields for update")
 	}
 
+	args = append(args, id)
+	query := fmt.Sprintf("UPDATE contract_discount SET %s WHERE id=$%d RETURNING id;", strings.Join(setParts, ", "), argPos)
+
 	var discountId int
-
-	query := fmt.Sprintf("")
-
 	err := r.db.QueryRow(query, args...).Scan(&discountId)
 
 	return discountId, err
@@ -616,6 +616,7 @@ func (r *ContractsRepository) EditContractRhInfo(id int, c models.EditContractRh
 		return 0, errors.New("Missing fields for update")
 	}
 
+	args = append(args, id)
 	query := fmt.Sprintf("UPDATE contract_rh_info SET %s WHERE id=$%d RETURNING id", strings.Join(setParts, ", "), argPos)
 
 	var contractRhId int
@@ -627,19 +628,19 @@ func (r *ContractsRepository) EditContractRhInfo(id int, c models.EditContractRh
 }
 
 func (r *ContractsRepository) DeactivateContract(id int) error {
-	query := `UPDATE contract SET is_active = false WHERE id = $1`
+	query := `UPDATE contracts SET is_active = false WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err
 }
 
 func (r *ContractsRepository) ReactivateContract(id int) error {
-	query := `UPDATE contract SET is_active = true WHERE id = $1`
+	query := `UPDATE contracts SET is_active = true WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err
 }
 
 func (r *ContractsRepository) GetContract(id int) (models.GetAllContracts, error) {
-	query := `SELECT c.id, c.name, c.code, d.date_initial FROM contracts c LEFT JOIN contracts_date d ON c.fk_contract_dates = d.id WHERE c.id = $1;`
+	query := `SELECT c.id, c.name, c.code, d.date_initial FROM contracts c LEFT JOIN contract_dates d ON c.fk_contract_dates = d.id WHERE c.id = $1;`
 	row := r.db.QueryRow(query, id)
 	var contract models.GetAllContracts
 	err := row.Scan(
@@ -650,7 +651,7 @@ func (r *ContractsRepository) GetContract(id int) (models.GetAllContracts, error
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return models.GetAllContracts{}, fmt.Errorf("contract with id %s not found", id)
+			return models.GetAllContracts{}, fmt.Errorf("contract with id %d not found", id)
 		}
 		return models.GetAllContracts{}, err
 	}
@@ -760,7 +761,7 @@ func (r *ContractsRepository) GetContractDiscount(id int) (models.ContractDiscou
 }
 
 func (r *ContractsRepository) GetContractRhInfo(id int) (models.ContractRhInfoModel, error) {
-	query := `SELECT id, hour_limit, minutes_limit, days_first_exp, days_second_exp, data_init, pay_extra_hour, manual_stitch, pays_breakfast FROM contract_rh WHERE id = $1;`
+	query := `SELECT id, hour_limit, minutes_limit, days_first_exp, days_second_exp, data_init, pay_extra_hour, manual_stitch, pays_breakfast FROM contract_rh_info WHERE id = $1;`
 	row := r.db.QueryRow(query, id)
 	var contractRhInfo models.ContractRhInfoModel
 	err := row.Scan(
