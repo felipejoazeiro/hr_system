@@ -1,0 +1,8 @@
+{
+  "acronym_values": "EDIT-TEST-001",
+  "bdi_service": 30,
+  "bdi_material": 25,
+  "bdi_labor": 35,
+  "entry_table": false,
+  "send_email": true
+}

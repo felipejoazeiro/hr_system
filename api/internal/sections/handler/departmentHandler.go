@@ -4,6 +4,7 @@ import (
 	"app/internal/sections/models"
 	"app/internal/sections/repository"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +44,12 @@ func (h *DepartmentHandler) CreateDepartment(c *gin.Context) {
 }
 
 func (h *DepartmentHandler) EditDepartment(c *gin.Context) {
-	id := c.Param("id")
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+	}
 	var input models.EditDepartmentRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato inválido"})
@@ -59,7 +65,12 @@ func (h *DepartmentHandler) EditDepartment(c *gin.Context) {
 }
 
 func (h *DepartmentHandler) DeactivateDepartment(c *gin.Context) {
-	id := c.Param("id")
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+	}
 
 	if err := h.repo.DeactivateDepartment(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -69,7 +80,11 @@ func (h *DepartmentHandler) DeactivateDepartment(c *gin.Context) {
 }
 
 func (h *DepartmentHandler) ReactivateDepartment(c *gin.Context) {
-	id := c.Param("id")
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+	}
 	if err := h.repo.ReactivateDepartment(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

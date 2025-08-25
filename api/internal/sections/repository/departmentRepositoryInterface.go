@@ -7,7 +7,7 @@ import (
 type DepartmentRepositoryInterface interface {
     GetAllDepartments() ([]models.GetDepartmentsRequest, error)
     CreateDepartment(input models.CreateDepartmentRequest) (models.DepartmentModel, error)
-    EditDepartment(id string, input models.EditDepartmentRequest) (models.DepartmentModel, error) // Adicionado id como parâmetro
-    DeactivateDepartment(id string) error
-    ReactivateDepartment(id string) error
+    EditDepartment(id int, input models.EditDepartmentRequest) (models.DepartmentModel, error) // Adicionado id como parâmetro
+    DeactivateDepartment(id int) error
+    ReactivateDepartment(id int) error
 }

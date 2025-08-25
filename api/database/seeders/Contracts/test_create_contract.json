@@ -1,0 +1,59 @@
+{
+  "name": "Contrato Teste API",
+  "code": "CONT-TEST-001",
+  "research": true,
+  "uses_cpf": true,
+  "is_active": true,
+  "info": {
+    "construction": "Construção Teste Via API",
+    "cap": "CAP-TEST-001",
+    "process": "PROC-TEST-001",
+    "info_pmco": "Projeto de teste para validação da API de criação de contratos com todas as funcionalidades",
+    "max_employee": 75,
+    "address": "Rua de Teste da API",
+    "nro": 999,
+    "complement": "Sala de Testes",
+    "phone": 11999887766,
+    "state": "SP",
+    "city": "São Paulo",
+    "cep": "12345-678",
+    "email": "teste@contratos.com",
+    "contact": "Desenvolvedor Teste",
+    "fk_employee": 1
+  },
+  "dates": {
+    "date_initial": "2024-12-01T08:00:00Z",
+    "date_limit": "2025-11-30T18:00:00Z",
+    "date_guarantee": "2026-05-30T23:59:59Z",
+    "date_proposal": "2024-10-15T14:30:00Z",
+    "date_budget": "2024-11-01T16:45:00Z",
+    "date_tables": "2024-11-15T10:00:00Z"
+  },
+  "values": {
+    "acronym_values": "TEST-001",
+    "bdi_service": 25,
+    "bdi_material": 20,
+    "bdi_labor": 30,
+    "entry_table": true,
+    "send_email": true
+  },
+  "discount": {
+    "disc_identifier": 5,
+    "disc_service": 10,
+    "disc_transport": 8,
+    "disc_tranp_employee": 12,
+    "disc_labor": 15,
+    "disc_material": 7,
+    "disc_field": 9
+  },
+  "rh_info": {
+    "hour_limit": "1970-01-01T08:00:00Z",
+    "minutes_limit": "1970-01-01T00:00:00Z",
+    "days_first_exp": 45,
+    "days_second_exp": 90,
+    "data_init": "2024-12-01T08:00:00Z",
+    "pay_extra_hour": true,
+    "manual_stitch": false,
+    "pays_breakfast": true
+  }
+}
