@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"app/internal/contracts"
 	"app/internal/hr"
 	"app/internal/positions"
 	"app/internal/sections"
@@ -15,6 +16,7 @@ func SetupRouter() *gin.Engine{
 		hr.RegisterRoutes(api)
 		sections.RegisterRoutes(api)
 		positions.RegisterRoutes(api)
+		contracts.RegisterRoutes(api)
 	}
 	return router
 }

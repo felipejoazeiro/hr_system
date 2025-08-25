@@ -1,7 +1,7 @@
 package models
 
 type EmployeeDataForList struct {
-	ID         string `json:"id" db:"id"`
+	ID         int `json:"id" db:"id"`
 	Register   string `json:"register" db:"register"`
 	Name       string `json:"name" db:"name"`
 	Email      string `json:"email" db:"email"`

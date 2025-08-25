@@ -1,0 +1,59 @@
+{
+  "name": "Contrato Infraestrutura Metropolitana",
+  "code": "CONT-INFRA-METRO-001",
+  "research": true,
+  "uses_cpf": false,
+  "is_active": true,
+  "info": {
+    "construction": "Linha 6 do Metrô - Extensão Norte",
+    "cap": "CAP-METRO-2024-020",
+    "process": "PROC-INFRAESTRUTURA-020",
+    "info_pmco": "Construção de 15km de linha metroviária subterrânea com 12 estações, incluindo sistemas de ventilação, energia e sinalização",
+    "max_employee": 350,
+    "address": "Av. Paulista",
+    "nro": 0,
+    "complement": "Estação Central",
+    "phone": 11976543210,
+    "state": "SP",
+    "city": "São Paulo",
+    "cep": "01310-000",
+    "email": "metro.linha6@transporte.gov.br",
+    "contact": "Eng. Roberto Transportes",
+    "fk_employee": 5
+  },
+  "dates": {
+    "date_initial": "2025-03-01T06:00:00Z",
+    "date_limit": "2028-02-29T20:00:00Z",
+    "date_guarantee": "2030-02-28T23:59:59Z",
+    "date_proposal": "2024-09-15T10:00:00Z",
+    "date_budget": "2024-10-30T14:30:00Z",
+    "date_tables": "2024-12-15T16:45:00Z"
+  },
+  "values": {
+    "acronym_values": "METRO-L6",
+    "bdi_service": 35,
+    "bdi_material": 30,
+    "bdi_labor": 40,
+    "entry_table": true,
+    "send_email": false
+  },
+  "discount": {
+    "disc_identifier": 2,
+    "disc_service": 5,
+    "disc_transport": 3,
+    "disc_tranp_employee": 8,
+    "disc_labor": 10,
+    "disc_material": 4,
+    "disc_field": 6
+  },
+  "rh_info": {
+    "hour_limit": "1970-01-01T07:00:00Z",
+    "minutes_limit": "1970-01-01T00:00:00Z",
+    "days_first_exp": 30,
+    "days_second_exp": 60,
+    "data_init": "2025-03-01T06:00:00Z",
+    "pay_extra_hour": true,
+    "manual_stitch": false,
+    "pays_breakfast": false
+  }
+}

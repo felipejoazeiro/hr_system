@@ -1,0 +1,10 @@
+{
+  "hour_limit": "2024-01-01T08:00:00Z",
+  "minutes_limit": "2024-01-01T17:30:00Z",
+  "days_first_exp": 90,
+  "days_second_exp": 180,
+  "data_init": "2024-01-15T08:00:00Z",
+  "pay_extra_hour": true,
+  "manual_stitch": false,
+  "pays_breakfast": true
+}

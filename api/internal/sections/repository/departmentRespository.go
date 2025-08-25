@@ -3,6 +3,7 @@ package repository
 import (
 	"app/internal/sections/models"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -74,7 +75,7 @@ func (r *DepartmentRepository) CreateDepartment(d models.CreateDepartmentRequest
 	return department, err
 }
 
-func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartmentRequest) (models.DepartmentModel, error) {
+func (r *DepartmentRepository) EditDepartment(id int, d models.EditDepartmentRequest) (models.DepartmentModel, error) {
 	setParts := []string{}
 	args := []interface{}{}
 	argPos := 1
@@ -96,7 +97,7 @@ func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartment
 	}
 
 	if len(setParts) == 0 {
-		return models.DepartmentModel{}, nil
+		return models.DepartmentModel{}, errors.New("nenhum campo para atualizar")
 	}
 
 	args = append(args, id)
@@ -114,13 +115,13 @@ func (r *DepartmentRepository) EditDepartment(id string, d models.EditDepartment
 	return updated, err
 }
 
-func (r *DepartmentRepository) DeactivateDepartment(id string) error {
+func (r *DepartmentRepository) DeactivateDepartment(id int) error {
 	query := `UPDATE departments SET is_active = false WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err
 }
 
-func (r *DepartmentRepository) ReactivateDepartment(id string) error {
+func (r *DepartmentRepository) ReactivateDepartment(id int) error {
 	query := `UPDATE departments SET is_active = true WHERE id = $1`
 	_, err := r.db.Exec(query, id)
 	return err

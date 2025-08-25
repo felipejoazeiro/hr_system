@@ -1,0 +1,59 @@
+{
+  "name": "Contrato Residencial Luxo",
+  "code": "CONT-RES-LUX-001",
+  "research": false,
+  "uses_cpf": true,
+  "is_active": true,
+  "info": {
+    "construction": "Residencial de Alto Padrão Golden Tower",
+    "cap": "CAP-RES-2024-015",
+    "process": "PROC-RESIDENCIAL-015",
+    "info_pmco": "Projeto residencial premium com 200 apartamentos de 3 e 4 dormitórios, área de lazer completa com piscinas, quadras e spa",
+    "max_employee": 120,
+    "address": "Av. Brigadeiro Faria Lima",
+    "nro": 3500,
+    "complement": "Torre Golden",
+    "phone": 11987651234,
+    "state": "SP",
+    "city": "São Paulo",
+    "cep": "01452-000",
+    "email": "golden.tower@construtora.com",
+    "contact": "Arquiteta Marina Silva",
+    "fk_employee": 2
+  },
+  "dates": {
+    "date_initial": "2025-01-15T07:00:00Z",
+    "date_limit": "2026-12-31T18:00:00Z",
+    "date_guarantee": "2027-12-31T23:59:59Z",
+    "date_proposal": "2024-11-01T15:30:00Z",
+    "date_budget": "2024-11-20T17:00:00Z",
+    "date_tables": "2024-12-05T09:30:00Z"
+  },
+  "values": {
+    "acronym_values": "RES-LUX",
+    "bdi_service": 28,
+    "bdi_material": 24,
+    "bdi_labor": 35,
+    "entry_table": true,
+    "send_email": true
+  },
+  "discount": {
+    "disc_identifier": 3,
+    "disc_service": 8,
+    "disc_transport": 6,
+    "disc_tranp_employee": 10,
+    "disc_labor": 12,
+    "disc_material": 5,
+    "disc_field": 7
+  },
+  "rh_info": {
+    "hour_limit": "1970-01-01T08:30:00Z",
+    "minutes_limit": "1970-01-01T00:15:00Z",
+    "days_first_exp": 60,
+    "days_second_exp": 120,
+    "data_init": "2025-01-15T07:00:00Z",
+    "pay_extra_hour": true,
+    "manual_stitch": true,
+    "pays_breakfast": true
+  }
+}
