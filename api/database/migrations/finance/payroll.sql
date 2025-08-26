@@ -11,10 +11,10 @@ CREATE TABLE payroll_components (
 -- Histórico salarial por funcionário (mudanças de base)
 CREATE TABLE employee_salary_history (
   id SERIAL PRIMARY KEY,
-  employee_id INT NOT NULL REFERENCES employees(id),
   base_salary NUMERIC(14,2) NOT NULL,
   valid_from DATE NOT NULL,
   valid_to DATE
+  fk_employee INT NOT NULL REFERENCES employees(id),
 );
 
 -- Folhas (competência)
