@@ -19,6 +19,16 @@ func (h *CostCentersHandler) GetAllCostCenters(c *gin.Context){
 	c.JSON(http.StatusOK, costCenters)
 }
 
+func (h *CostCentersHandler) GetCostCenterByID(c *gin.Context) {
+	id := c.Param("id")
+	costCenter, err := h.repo.GetCostCenterByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, costCenter)
+}
+
 func (h *CostCentersHandler) CreateCostCenter(c *gin.Context) {
 	var costCenter models.CreateCostCenters
 	if err := c.ShouldBindJSON(&costCenter); err != nil {
